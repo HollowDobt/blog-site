@@ -1,0 +1,194 @@
+{
+  "main": {
+    "id": "656b76d3dcf87333",
+    "type": "split",
+    "children": [
+      {
+        "id": "023702b7481511b3",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "18abef48c3270355",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "source/_posts/恐怖 RPG 游戏 血怨 游玩记录.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "恐怖 RPG 游戏 血怨 游玩记录"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "8aebd47abb49b803",
+    "type": "split",
+    "children": [
+      {
+        "id": "2d96c2a319cb3b85",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "63446d33bdade654",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "文件列表"
+            }
+          },
+          {
+            "id": "3194ebc24d2b00e2",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "搜索"
+            }
+          },
+          {
+            "id": "ea2837c9e3f7bd5c",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "书签"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "b615ae17a48b5842",
+    "type": "split",
+    "children": [
+      {
+        "id": "714fb521bbbc7b7f",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "da6056126976fb44",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "source/_posts/恐怖 RPG 游戏 血怨 游玩记录.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "恐怖 RPG 游戏 血怨 游玩记录 的反向链接列表"
+            }
+          },
+          {
+            "id": "177fa306bafc0f14",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "source/_posts/恐怖 RPG 游戏 血怨 游玩记录.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "恐怖 RPG 游戏 血怨 游玩记录 的出链列表"
+            }
+          },
+          {
+            "id": "6e8e2d1beaa27596",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "标签"
+            }
+          },
+          {
+            "id": "70f7edba6d40a216",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "source/_posts/恐怖 RPG 游戏 血怨 游玩记录.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "恐怖 RPG 游戏 血怨 游玩记录 的大纲"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false
+    }
+  },
+  "active": "18abef48c3270355",
+  "lastOpenFiles": [
+    "db.json",
+    "public/images/star-bg.png",
+    "public/2025/07/01/hello-world/index.html",
+    "public/2025/07/01/hello-world",
+    "public/2025/07/01",
+    "public/fonts/wenkai/files/lxgwwenkaimono-light-subset-103.woff2",
+    "public/fonts/wenkai/files/lxgwwenkaimono-light-subset-100.woff2",
+    "public/archives/2025/07/index.html",
+    "public/2025/07/04/恐怖 RPG 游戏 血怨 游玩记录/index.html",
+    "public/2025/07/04/恐怖 RPG 游戏 血怨 游玩记录",
+    "public/2025/07/04",
+    "public/fonts/wenkai/files/lxgwwenkai-light-subset-103.woff2",
+    "public/images/apple-touch-icon-next.png",
+    "public/images/favicon.png",
+    "public/images/avatar.gif",
+    "public/images/logo.svg",
+    "public/images/favicon-32x32-next.png",
+    "public/images/favicon-16x16-next.png",
+    "source/_posts/hello-world.md",
+    "source/_posts/恐怖 RPG 游戏 血怨 游玩记录.md"
+  ]
+}
