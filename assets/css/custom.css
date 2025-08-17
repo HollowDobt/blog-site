@@ -1,5 +1,12 @@
+/* Font settings */
 @import url("https://docs.hollowlib.top/_assets/fonts/wenkai/style.css");
 
 :root {
   --font-sans: "LXGW WenKai", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+
+/* Search UI settings */
+#search-results {
+  margin-top: 0.55rem;
 }
