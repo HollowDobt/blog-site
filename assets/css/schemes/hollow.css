@@ -20,7 +20,7 @@
       --color-primary-500: 107, 114, 128; 
       --color-primary-600: 75, 85, 99; 
       --color-primary-700: 55, 65, 81; 
-      --color-primary-800: 31, 41, 55; 
+      --color-primary-800: 31, 31, 35; 
       --color-primary-900: 17, 24, 39; 
       /* Cyan (Secondary - accent, low usage) */ 
       --color-secondary-50: 236, 254, 255; 
@@ -38,3 +38,4 @@
 .dark .bg-neutral {
   background-color: rgba(var(--color-neutral-800), 1) !important;
 }
+

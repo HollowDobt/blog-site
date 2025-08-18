@@ -2,25 +2,30 @@ disabled = false
 languageCode = "en"
 languageName = "English"
 weight = 1
-title = "Blowfish"
+title = "Hollow's Blog"
 
 [params]
   displayName = "EN"
   isoCode = "en"
   rtl = false
-  dateFormat = "2 January 2006"
-  # logo = "img/logo.png"
-  # secondaryLogo = "img/secondary-logo.png"
-  # description = "My awesome website"
-  # copyright = "Copy, _right?_ :thinking_face:"
+  dateFormat = "2006 January 2"
+  # logo = "img/favicon.png"
+  # secondaryLogo = "img/favicon.png"
+  description = "Hollow Dobt's life record"
+  copyright = "Copyright &copy; 2025 - today Hollow Dobt"
 
-# [params.author]
-#   name = "Your name here"
-#   email = "youremail@example.com"
-#   image = "img/blowfish_logo.png"
-#   imageQuality = 96
-#   headline = "I'm only human"
-#   bio = "A little bit about you"
+[params.author]
+  name = "Hollow Dobt/帆楼"
+  email = "rxq@hollowlib.top"
+  image = "img/star-bg.png"
+  imageQuality = 100
+  headline = "Flowers' fade, leaves' birth"
+  bio = "Flowers' fade, leaves' birth"
+  links = [
+    { email = "mailto:rxq@hollowlib.top" },
+    { github = "https://github.com/HollowDobt" },
+    { heart	= "https://hollowlib.top" }
+  ]
 #   links = [
 #     { email = "mailto:hello@your_domain.com" },
 #     { link = "https://link-to-some-website.com/" },
