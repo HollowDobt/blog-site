@@ -15,6 +15,7 @@ buildDrafts = false
 buildFuture = false
 
 enableEmoji = true
+enableGitInfo = true
 
 googleAnalytics = "G-TCDSJEFYY3"
 
@@ -34,6 +35,10 @@ googleAnalytics = "G-TCDSJEFYY3"
   changefreq = 'daily'
   filename = 'sitemap.xml'
   priority = 0.5
+
+[frontmatter]
+date    = ["date", ":filename", "publishDate", ":default"]
+lastmod = [":git", "lastmod", ":fileModTime", "date"]
 
 [outputs]
   home = ["HTML", "RSS", "JSON"]
@@ -67,3 +72,5 @@ googleAnalytics = "G-TCDSJEFYY3"
       name = 'fragmentrefs'
       type = 'fragments'
       weight = 10
+
+
