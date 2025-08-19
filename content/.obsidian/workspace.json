@@ -1,0 +1,178 @@
+{
+  "main": {
+    "id": "d59059076e511fb3",
+    "type": "split",
+    "children": [
+      {
+        "id": "e10bb856245f9bfe",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "e2a9f865e89eba6f",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "posts/2025-08-19-中国人的文化延续.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "2025-08-19-中国人的文化延续"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "5a06ebf01374a8bd",
+    "type": "split",
+    "children": [
+      {
+        "id": "01c7ad2d75081bd6",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "72bbbf3895153aad",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "文件列表"
+            }
+          },
+          {
+            "id": "3386e344ffe449bb",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "tag:文化",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "搜索"
+            }
+          },
+          {
+            "id": "52bc1e8b78ae2eb5",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "书签"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "4178565f252b35b2",
+    "type": "split",
+    "children": [
+      {
+        "id": "60093e02f748b9ab",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "cbd989c78aae38d9",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "posts/2025-08-19-中国人的文化延续.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "2025-08-19-中国人的文化延续 的反向链接列表"
+            }
+          },
+          {
+            "id": "6ced8c60dbfbb0d0",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "posts/2025-08-19-中国人的文化延续.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "2025-08-19-中国人的文化延续 的出链列表"
+            }
+          },
+          {
+            "id": "25277715f527640a",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "标签"
+            }
+          },
+          {
+            "id": "0eb68ea3b01b2117",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "posts/2025-08-19-中国人的文化延续.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "2025-08-19-中国人的文化延续 的大纲"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false
+    }
+  },
+  "active": "e2a9f865e89eba6f",
+  "lastOpenFiles": [
+    "posts/2025-08-13-血怨通关纪实-01.md",
+    "2025-08-13-about.md",
+    "posts/2025-08-19-中国人的文化延续.md",
+    "未命名.md"
+  ]
+}
