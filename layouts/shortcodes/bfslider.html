@@ -1,0 +1,105 @@
+{{- $images := .Get "images" -}}    <!-- 使用 | 分隔的外链图片 URL 列表 -->
+{{- $alt := .Get "alt" | default "" -}}
+{{- $ratio := .Get "ratio" | default "16/9" -}}
+
+<div class="bf-slider" style="aspect-ratio: {{ $ratio }};" tabindex="0"
+     data-images="{{ $images | safeHTMLAttr }}" data-alt="{{ $alt | safeHTMLAttr }}">
+
+  <div class="bf-slider-track" aria-live="polite"></div>
+
+  <button class="bf-nav bf-prev" type="button" aria-label="上一张">‹</button>
+  <button class="bf-nav bf-next" type="button" aria-label="下一张">›</button>
+
+  <div class="bf-dots" role="tablist" aria-label="选择图片序号"></div>
+</div>
+
+<style>
+  .bf-slider{ position:relative; width:100%; min-height:260px; overflow:hidden; border:none; background:transparent; }
+  .bf-slider-track{ display:flex; height:100%; transition:transform .35s ease; will-change:transform; }
+  .bf-slide{ min-width:100%; height:100%; display:grid; place-items:center; background:#111; }
+  .bf-slide img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+  .bf-nav{ position:absolute; top:50%; transform:translateY(-50%); border:none; background:transparent;
+           width:44px; height:44px; font-size:28px; line-height:44px; color:#fff; cursor:pointer; opacity:.9; }
+  .bf-prev{ left:8px; } .bf-next{ right:8px; }
+  .bf-nav:hover{ opacity:1; }
+
+  .bf-dots{ position:absolute; left:50%; bottom:12px; transform:translateX(-50%);
+            display:flex; gap:8px; align-items:center; }
+  .bf-dot{ width:28px; height:4px; border:none; border-radius:2px; background:#bfbfbf; cursor:pointer; opacity:.9; }
+  .bf-dot.active{ background:#ffffff; opacity:1; }
+
+  @media (prefers-reduced-motion: reduce){ .bf-slider-track{ transition:none; } }
+</style>
+
+<script>
+(function(){
+  // 向上回溯，找到最近的 .bf-slider（跳过 <style> 等节点）
+  let el = document.currentScript.previousElementSibling;
+  while (el && !(el.classList && el.classList.contains('bf-slider'))) {
+    el = el.previousElementSibling;
+  }
+  const root = el;
+  if (!root) return; // 保险：DOM 被改动时直接退出
+
+  const urls = (root.dataset.images || "").split("|").map(s=>s.trim()).filter(Boolean);
+  if (!urls.length) return;
+
+  const alt = root.dataset.alt || "";
+  const track = root.querySelector(".bf-slider-track");
+  const dotsWrap = root.querySelector(".bf-dots");
+  let index = 0;
+
+  function makeSlide(url, i){
+    const slide = document.createElement("div");
+    slide.className = "bf-slide";
+    const img = document.createElement("img");
+    img.loading = "lazy";
+    img.decoding = "async";
+    img.alt = alt ? alt : ("image " + (i+1));
+    // 运行时再设置 src，避免构建期静态请求
+    img.dataset.src = url;
+    slide.appendChild(img);
+    track.appendChild(slide);
+
+    const dot = document.createElement("button");
+    dot.className = "bf-dot";
+    dot.type = "button";
+    dot.setAttribute("aria-label", "跳到第 " + (i+1) + " 张");
+    dot.addEventListener("click", ()=>go(i));
+    dotsWrap.appendChild(dot);
+  }
+
+  urls.forEach((u,i)=>makeSlide(u,i));
+
+  function slides(){ return Array.from(track.children); }
+  function ensureLoaded(i){
+    const s = slides()[i];
+    if(!s) return;
+    const img = s.querySelector("img");
+    if(img && !img.src){ img.src = img.dataset.src; }
+  }
+
+  function update(){
+    track.style.transform = "translateX(" + (index * -100) + "%)";
+    ensureLoaded(index);
+    ensureLoaded(index+1);
+    ensureLoaded(index-1);
+    root.querySelectorAll(".bf-dot").forEach((d,i)=>d.classList.toggle("active", i===index));
+  }
+
+  function go(i){ index = (i + urls.length) % urls.length; update(); }
+
+  const prevBtn = root.querySelector(".bf-prev");
+  const nextBtn = root.querySelector(".bf-next");
+  if (prevBtn) prevBtn.addEventListener("click", ()=>go(index-1));
+  if (nextBtn) nextBtn.addEventListener("click", ()=>go(index+1));
+
+  root.addEventListener("keydown", e=>{
+    if(e.key==="ArrowLeft") go(index-1);
+    if(e.key==="ArrowRight") go(index+1);
+  });
+
+  update();
+})();
+</script>
