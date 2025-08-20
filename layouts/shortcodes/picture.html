@@ -16,20 +16,10 @@
 {{ $css := resources.FromString (printf "css/carousel-%s.css" $id) $cssContent | minify | resources.Fingerprint (.Site.Params.fingerprintAlgorithm | default "sha512") }}
 <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
 
-{{ $page := .Page.Resources }}
 {{ $imagesTemp := .Get "images" }}
 {{ $imagesTemp = strings.TrimPrefix "{" $imagesTemp }}
 {{ $imagesTemp = strings.TrimSuffix "}" $imagesTemp }}
-{{ $imagesTemp := strings.Split $imagesTemp "," }}
-{{ $images := slice }}
-{{ range $imagesTemp }}
-  {{ if or (strings.HasPrefix . "http:") (strings.HasPrefix . "https:") }}
-    {{ $images = $images | append (resources.GetRemote .) }}
-  {{ else }}
-    {{ $images = $images | append ($page.Match .) }}
-  {{ end }}
-{{ end }}
-
+{{ $images := strings.Split $imagesTemp "," }}
 
 <div
   id="{{ $id }}"
@@ -56,15 +46,17 @@
   <div class="relative w-full overflow-hidden after:clear-both after:block after:content-['']">
     {{ range $index, $image := $images }}
       {{ $hiddenClass := cond (eq $index 0) "" "hidden" }}
+      {{ $cleanImage := strings.TrimSpace $image }}
       <div
         class="relative float-left -mr-[100%] {{ $hiddenClass }} w-full transition-transform ease-in-out motion-reduce:transition-none"
         data-twe-carousel-item
         {{ if eq $index 0 }}data-twe-carousel-active{{ end }}>
         <div class="ratio-{{ $aspect }} single_hero_background">
           <img
-            src="{{ $image.RelPermalink }}"
+            src="{{ $cleanImage }}"
             class="block absolute top-0 object-cover w-full h-full nozoom"
-            alt="carousel image {{ add $index 1 }}">
+            alt="carousel image {{ add $index 1 }}"
+            loading="lazy">
         </div>
       </div>
     {{ end }}
