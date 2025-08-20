@@ -21,6 +21,10 @@
 {{ $imagesTemp = strings.TrimSuffix "}" $imagesTemp }}
 {{ $images := strings.Split $imagesTemp "," }}
 
+<!-- Debug: Carousel ID and Images -->
+<!-- Carousel ID: {{ $id }} -->
+<!-- Images: {{ $images }} -->
+
 <div
   id="{{ $id }}"
   class="relative"
@@ -106,3 +110,94 @@
     >
   </button>
 </div>
+
+<!-- JavaScript to ensure carousel initialization -->
+<script>
+(function() {
+  // Wait for DOM to be ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCarousel);
+  } else {
+    initCarousel();
+  }
+  
+  function initCarousel() {
+    const carousel = document.getElementById('{{ $id }}');
+    if (carousel) {
+      console.log('Carousel found:', '{{ $id }}');
+      console.log('Images in carousel:', {{ len $images }});
+      
+      // Check if TWE is available and try to initialize
+      if (typeof window.TWE !== 'undefined' && window.TWE.Carousel) {
+        const carouselInstance = new window.TWE.Carousel(carousel);
+        console.log('TWE Carousel initialized for {{ $id }}');
+      } else if (typeof window.bootstrap !== 'undefined') {
+        // Fallback to Bootstrap if available
+        console.log('Using Bootstrap fallback for carousel {{ $id }}');
+      } else {
+        console.warn('No carousel library found for {{ $id }}');
+        // Manual fallback - simple image switching
+        let currentIndex = 0;
+        const items = carousel.querySelectorAll('[data-twe-carousel-item]');
+        const indicators = carousel.querySelectorAll('[data-twe-target="#{{ $id }}"]');
+        
+        function showSlide(index) {
+          items.forEach((item, i) => {
+            if (i === index) {
+              item.classList.remove('hidden');
+              item.setAttribute('data-twe-carousel-active', '');
+            } else {
+              item.classList.add('hidden');
+              item.removeAttribute('data-twe-carousel-active');
+            }
+          });
+          
+          indicators.forEach((indicator, i) => {
+            if (i === index) {
+              indicator.setAttribute('data-twe-carousel-active', '');
+              indicator.setAttribute('aria-current', 'true');
+            } else {
+              indicator.removeAttribute('data-twe-carousel-active');
+              indicator.removeAttribute('aria-current');
+            }
+          });
+        }
+        
+        // Auto-advance slides
+        setInterval(() => {
+          currentIndex = (currentIndex + 1) % items.length;
+          showSlide(currentIndex);
+        }, {{ $interval }});
+        
+        // Handle manual navigation
+        indicators.forEach((indicator, index) => {
+          indicator.addEventListener('click', () => {
+            currentIndex = index;
+            showSlide(currentIndex);
+          });
+        });
+        
+        // Handle prev/next buttons
+        const prevBtn = carousel.querySelector('[data-twe-slide="prev"]');
+        const nextBtn = carousel.querySelector('[data-twe-slide="next"]');
+        
+        if (prevBtn) {
+          prevBtn.addEventListener('click', () => {
+            currentIndex = currentIndex > 0 ? currentIndex - 1 : items.length - 1;
+            showSlide(currentIndex);
+          });
+        }
+        
+        if (nextBtn) {
+          nextBtn.addEventListener('click', () => {
+            currentIndex = (currentIndex + 1) % items.length;
+            showSlide(currentIndex);
+          });
+        }
+      }
+    } else {
+      console.error('Carousel element not found:', '{{ $id }}');
+    }
+  }
+})();
+</script>
