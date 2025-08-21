@@ -29,11 +29,11 @@ tags:
 我们组最终选择了一家火锅店作为这场比赛的结束. 大家聊得很开心, 天南海北, 各自家乡的特色, 一些有趣的回忆, 高中与大学如何如何, 这桌菜怎样怎样. 应该说我们算是幸运的, 当时这家店小龙虾促销, 贵两块钱就可以拿三大份小龙虾. 再加上一堆牛肉, 虾滑, 蔬菜, 这顿饭吃的是相当开心. 尽管我们这六个人只是七天的"拼好队"伙伴, 甚至相互之间名字都没记住, 但是我们都很开心! 虽然正式组队很多人都走了, 但那又如何呢?
 
 {{< gallery >}}
-  <img src="CBB21F88-54BB-4FB3-A61E-494620A7C7C0_1_105_c.jpeg" class="grid-w33" />
-  <img src="5111751288719_.pic.jpg" class="grid-w33" />
-    <img src="5111751288719_.pic.jpg" class="grid-w33" />
-  <img src="3031751165154_.pic.jpg" class="grid-w33" />
-  <img src="331750867622_.pic.jpg" class="grid-w33" />
-  <img src="" class="grid-w33" />
-  <img src="871750948428_.pic.jpg" class="grid-w33" />
+  <img src="CBB21F88-54BB-4FB3-A61E-494620A7C7C0_1_105_c.jpeg" class="grid-w50" />
+  <img src="5111751288719_.pic.jpg" class="grid-w50" />
+  <img src="5111751288719_.pic.jpg" class="grid-w50" />
+  <img src="3031751165154_.pic.jpg" class="grid-w50" />
+  <img src="331750867622_.pic.jpg" class="grid-w50" />
+  <img src="" class="grid-w50" />
+  <img src="871750948428_.pic.jpg" class="grid-w50" />
 {{< /gallery >}}
