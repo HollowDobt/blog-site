@@ -17,6 +17,8 @@ buildFuture = false
 enableEmoji = true
 enableGitInfo = true
 
+hasCJKLanguage = true
+
 googleAnalytics = "G-TCDSJEFYY3"
 
 [pagination]
