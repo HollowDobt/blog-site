@@ -12,7 +12,7 @@ title = "Hollow's Blog"
   # logo = "img/favicon.png"
   # secondaryLogo = "img/favicon.png"
   description = "Hollow Dobt's life record"
-  copyright = "[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode.en) &copy; 2025 - today Hollow Dobt"
+  copyright = "[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode.en) | &copy; 2025 - today Hollow Dobt | <a href='https://icp.gov.moe/?keyword=20257760' target='_blank'>萌ICP备20257760号</a>"
 
 [params.author]
   name = "Hollow Dobt/帆楼"
