@@ -20,6 +20,11 @@
   pageRef = "2025-08-13-about"
   weight = 20
 
+[[main]]
+  name = "RSS"
+  url = "/index.xml"
+  weight = 30
+
 #[[main]]
 #  name = "Parent"
 #  weight = 20
