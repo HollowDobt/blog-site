@@ -36,27 +36,27 @@ tags:
 
 当然, 唯一遗憾的是, 九寨沟和黄龙的景色非常相似, 游玩方式也没有太多的区别. 因此第二天去黄龙时, 已经没了第一次见到那种宛如碧玉的池水时的那种惊喜感.
 
-{{< gallery >}}
 
- <img src="IMG_2111.JPG" class="grid-w100" />
 
- <img src="IMG_2125.jpeg" class="grid-w100" />
+ <img src="https://pan.xxbyq.net/f/bLxhM/IMG_2111.JPG" class="grid-w100" />
 
- <img src="IMG_2128.jpeg" class="grid-w100" />
+ <img src="https://pan.xxbyq.net/f/78aFq/IMG_2125.jpeg" class="grid-w100" />
 
- <img src="IMG_2133.jpeg" class="grid-w100" />
+ <img src="https://pan.xxbyq.net/f/JQWtR/IMG_2128.jpeg" class="grid-w100" />
 
- <img src="IMG_2137.jpeg" class="grid-w100" />
+ <img src="https://pan.xxbyq.net/f/KvDUW/IMG_2133.jpeg" class="grid-w100" />
 
- <img src="IMG_2147.jpeg" class="grid-w100" />
+ <img src="https://pan.xxbyq.net/f/RvZuW/IMG_2137.jpeg" class="grid-w100" />
 
- <img src="IMG_2150.jpeg" class="grid-w100" />
+ <img src="https://pan.xxbyq.net/f/apRt4/IMG_2147.jpeg" class="grid-w100" />
 
- <img src="IMG_2153.jpeg" class="grid-w100" />
+ <img src="https://pan.xxbyq.net/f/55wS0/IMG_2150.jpeg" class="grid-w100" />
 
- <img src="IMG_2168.jpeg" class="grid-w100" />
+ <img src="https://pan.xxbyq.net/f/zOmIZ/IMG_2153.jpeg" class="grid-w100" />
 
-{{< /gallery >}}
+ <img src="https://pan.xxbyq.net/f/xrLuA/IMG_2168.jpeg" class="grid-w100" />
+
+
 
 ## 九月中旬 - 十月底 September, October: CIAME, 组队与备赛
 
@@ -98,7 +98,7 @@ tags:
 
 {{< gallery >}}
 
- <img src="IMG_2381.jpeg" class="grid-w50" />
+ <img src="https://pan.xxbyq.net/f/rjycg/IMG_2381.jpeg" class="grid-w50" />
 
 {{< /gallery >}}
 
@@ -181,16 +181,15 @@ tags:
 | Aurora     | 主攻小车底盘设计, 能靠他暴力解决的问题就不是问题. 其实可以是体育生                                                           |
 | 糖醋哈密瓜 | 队伍宝藏男孩, 各个地方出现了问题总能从文档中发现答案进行解决. 就是老是找 npy 玩儿                                            |
 
-{{< gallery >}}
 
-​	<img src="17861760952993_.pic_hd.jpg" class="grid-w50" />
 
-​	<img src="23571761742638_.pic.jpg" class="grid-w50" />
+​	<img src="https://pan.xxbyq.net/f/ed7uG/17861760952993_.pic_hd.jpg" class="grid-w100" />
 
-​	<img src="23581761742639_.pic.jpg" class="grid-w50" />
+​	<img src="https://pan.xxbyq.net/f/OvWsa/23571761742638_.pic.jpg" class="grid-w100" />
 
-​	<img src="23991761743083_.pic.jpg" class="grid-w50" />
+​	<img src="https://pan.xxbyq.net/f/QxzhL/23581761742639_.pic.jpg" class="grid-w100" />
+
+​	<img src="https://pan.xxbyq.net/f/B56F6/23991761743083_.pic.jpg" class="grid-w100" />
 
 ​	
 
-{{< /gallery >}}
