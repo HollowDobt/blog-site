@@ -35,7 +35,36 @@
       --color-secondary-900: 22, 78, 99; 
 }
 
-.dark .bg-neutral {
+.dark body > :not(.fixed) .bg-neutral {
   background-color: rgba(var(--color-neutral-800), 1) !important;
 }
+
+/* 永远让 #menu-blur 可见，顶掉脚本与类名的透明度 */
+#menu-blur { opacity: 1 !important; }
+#menu-blur[style*="opacity"] { opacity: 1 !important; } /* 覆盖脚本加的 inline opacity */
+
+/* 透明化占位层自身背景，交给伪元素来做玻璃 */
+.fixed #menu-blur {
+  background: transparent !important;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+/* 玻璃层：半透明底 & 模糊 */
+.fixed #menu-blur::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(var(--color-neutral-900), 0.36);
+  backdrop-filter: blur(12px) saturate(120%);
+  -webkit-backdrop-filter: blur(12px) saturate(120%);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  pointer-events: none;
+}
+
+.fixed .main-menu { background: transparent !important; z-index: 1; }
+
+.dark #menu-blur.bg-neutral,
+.dark .fixed .bg-neutral { background: transparent !important; }
 

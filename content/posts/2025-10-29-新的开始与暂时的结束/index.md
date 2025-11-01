@@ -1,5 +1,8 @@
 ---
 title: 新的开始
+showHero: true
+heroStyle: background
+layoutBackgroundBlur: true
 tags:
   - 生活
   - 流水账

@@ -1,5 +1,8 @@
 ---
 title: 大一暑假的尾声
+layoutBackgroundBlur: true
+showHero: true
+heroStyle: background
 tags:
   - 生活
   - 流水账
