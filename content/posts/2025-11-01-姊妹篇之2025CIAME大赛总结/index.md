@@ -1,5 +1,5 @@
 ---
-title: "这支以不解散为目标的\"拼好队\"竟然这么强: 2025 CIAME 机器人大赛总结"
+title: "这支以不解散为目标的\"拼好队\"拿了一等奖: 2025 CIAME 机器人大赛总结"
 layoutBackgroundBlur: true
 showHero: true
 heroStyle: background
