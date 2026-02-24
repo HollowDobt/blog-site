@@ -400,37 +400,4 @@
 		}
 	}
 
-	/* Keep line rendering stable when the browser has partial CSS nesting support. */
-	.markdown h1 {
-		border-bottom: 4px solid;
-	}
-
-	.markdown h2 {
-		border-bottom: 2px solid;
-	}
-
-	.markdown hr {
-		border-bottom: 1px dashed var(--remark-color);
-	}
-
-	.markdown table {
-		border-collapse: collapse;
-		border-top: 3px solid var(--primary-color);
-		border-bottom: 3px solid var(--primary-color);
-		text-align: center;
-	}
-
-	.markdown table th,
-	.markdown table td {
-		padding: 5px 10px;
-	}
-
-	.markdown table th[colspan] {
-		border-bottom: 2px solid var(--primary-color);
-	}
-
-	.markdown table thead tr:last-child th,
-	.markdown table thead tr:last-child {
-		border-bottom: 2px solid var(--primary-color);
-	}
 }
