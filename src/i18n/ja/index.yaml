@@ -106,7 +106,14 @@ email:
     resend: 認証電書を再送
     send:
       failure: 認証電書を送信できませんでした
-      success: 認証電書を送信しました。リンクは 5 分以内に期限切れになりますので、お早めにご確認ください。
+      success: 認証コードを送信しました。10 分以内に認証してください。
+    code:
+      label: 認証コード
+      placeholder: 5 桁コードを入力
+      confirm: コード確認
+      send_first: 先に認証コードを送信してください
+      invalid: 認証コードが無効です
+      expired: 認証コードの期限が切れました。再送してください
     success: 電子書簡の認証に成功しました！
 feed:
   address: 購読アドレス
@@ -163,6 +170,9 @@ oauth:
       placeholder: 計算結果を入力
       empty: 人間認証を完了してください
       failure: 人間認証に失敗しました。再試行してください
+      verify: 人間認証を完了
+      done: 人間認証に成功しました
+      processing: 人間認証を実行中
     password:
       empty: 密碼は必須です
       mismatch: 2回入力した密碼が一致しません
@@ -172,11 +182,19 @@ oauth:
       invalid: 電子書簡または密碼の形式が正しくありません
     common:
       failure: 電子書簡ログインに失敗しました
+      mail_unavailable: メールサービスが一時的に利用できません
     register:
       name: 登録してログイン
+      confirm: コードを確認して登録
       switch: アカウントがない？登録
       success: 登録に成功しました
       conflict: この電子書簡は既に登録されています
+      ip_limit: 現在の IP はアカウント上限に達しています
+      code:
+        sent: 認証コードを送信しました。メールを確認してください
+        placeholder: 5 桁コードを入力
+        invalid: 認証コードが無効です
+        expired: 認証コードの期限が切れました。再送してください
     login:
       name: ログイン
       switch: 既に登録済み？ログイン

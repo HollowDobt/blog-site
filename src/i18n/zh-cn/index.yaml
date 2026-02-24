@@ -106,7 +106,14 @@ email:
     resend: 重新发送验证邮件
     send:
       failure: 无法发送验证邮件
-      success: 验证邮件已发送，链接将在 5 分钟后过期，请尽快查收
+      success: 验证码已发送，请在 10 分钟内完成验证
+    code:
+      label: 验证码
+      placeholder: 输入 5 位验证码
+      confirm: 确认验证码
+      send_first: 请先发送验证码
+      invalid: 验证码无效
+      expired: 验证码已过期，请重新发送
     success: 邮箱验证成功！
 feed:
   address: 订阅地址
@@ -163,6 +170,9 @@ oauth:
       placeholder: 输入结果
       empty: 请先完成人机验证
       failure: 人机验证失败，请重试
+      verify: 完成人机验证
+      done: 已通过人机验证
+      processing: 正在进行人机验证
     password:
       empty: 密码不能为空
       mismatch: 两次密码输入不一致
@@ -172,11 +182,19 @@ oauth:
       invalid: 邮箱或密码格式不正确
     common:
       failure: 邮箱登录失败
+      mail_unavailable: 邮件服务暂不可用，请稍后再试
     register:
       name: 注册并登录
+      confirm: 确认验证码并注册
       switch: 没有账号？去注册
       success: 注册成功，已登录
       conflict: 该邮箱已被注册
+      ip_limit: 当前 IP 已达到账号上限
+      code:
+        sent: 验证码已发送，请查收邮箱
+        placeholder: 输入 5 位验证码
+        invalid: 验证码无效
+        expired: 验证码已过期，请重新发送
     login:
       name: 登录
       switch: 已有账号？去登录

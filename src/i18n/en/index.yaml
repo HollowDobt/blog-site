@@ -106,9 +106,14 @@ email:
     resend: Resend verification email
     send:
       failure: Unable to send verification email
-      success: >-
-        Verification email sent. The link will expire in 5 minutes, please check
-        it as soon as possible.
+      success: Verification code sent. Please complete verification in 10 minutes.
+    code:
+      label: Verification code
+      placeholder: Enter 5-digit code
+      confirm: Confirm code
+      send_first: Send verification code first
+      invalid: Invalid verification code
+      expired: Verification code expired, please resend
     success: Email verification successful!
 feed:
   address: Subscription address
@@ -169,6 +174,9 @@ oauth:
       placeholder: Enter result
       empty: Complete human verification first
       failure: Human verification failed, please retry
+      verify: Complete human verification
+      done: Human verification passed
+      processing: Running human verification
     password:
       empty: Password cannot be empty
       mismatch: Password confirmation does not match
@@ -178,11 +186,19 @@ oauth:
       invalid: Invalid email or password format
     common:
       failure: Email sign in failed
+      mail_unavailable: Mail service is unavailable, please try again later
     register:
       name: Register and sign in
+      confirm: Confirm code and register
       switch: No account? Register
       success: Registration successful
       conflict: This email is already registered
+      ip_limit: Current IP has reached account limit
+      code:
+        sent: Verification code sent, please check your email
+        placeholder: Enter 5-digit code
+        invalid: Invalid verification code
+        expired: Verification code expired, please resend
     login:
       name: Sign in
       switch: Already registered? Sign in

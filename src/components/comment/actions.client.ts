@@ -270,7 +270,7 @@ export const actions = {
 			content: string;
 			link: string;
 			push?: number;
-			passer?: { nickname?: string | null; captcha?: string | null };
+			passer?: { nickname?: string | null; captcha?: string | null; captchaPayload?: unknown };
 		}): ActionResult<void> => {
 			const normalizedItem = normalizeCommentItemKey(item);
 			const body: Record<string, unknown> = { postKey: toPostKey(section, normalizedItem), section, item: normalizedItem, reply, content, link };
@@ -278,6 +278,7 @@ export const actions = {
 			if (push != null) body.push = push;
 			if (passer?.nickname) body.nickname = passer.nickname;
 			if (passer?.captcha) body.captcha = passer.captcha;
+			if (passer?.captchaPayload != null) body.captchaPayload = passer.captchaPayload;
 
 			return request<void>("/@/comments", { method: "POST", body: JSON.stringify(body) });
 		},
@@ -364,25 +365,51 @@ export const actions = {
 	},
 
 	auth: {
-		humanChallenge: async (): ActionResult<{ token: string; question: string }> => {
-			return request<{ token: string; question: string }>("/@/human/challenge");
+		humanChallenge: async (): ActionResult<{
+			provider: string;
+			challenge: {
+				algorithm: string;
+				challenge: string;
+				salt: string;
+				signature: string;
+				maxnumber?: number;
+			};
+			legacy?: {
+				token: string;
+				question: string;
+			};
+		}> => {
+			return request<{
+				provider: string;
+				challenge: {
+					algorithm: string;
+					challenge: string;
+					salt: string;
+					signature: string;
+					maxnumber?: number;
+				};
+				legacy?: {
+					token: string;
+					question: string;
+				};
+			}>("/@/human/challenge");
 		},
-		emailRegister: async ({
-			email,
-			password,
-			name,
-			challengeToken,
-			challengeAnswer
-		}: {
-			email: string;
-			password: string;
-			name?: string | null;
-			challengeToken: string;
-			challengeAnswer: string;
-		}): ActionResult<void> => {
-			return request<void>("/@/reach/email/register", {
+		emailRegister: async (
+			payload: {
+				email: string;
+				password: string;
+				name?: string | null;
+				captchaPayload?: unknown;
+				challengeToken?: string;
+				challengeAnswer?: string;
+			} | {
+				verificationId: string;
+				code: string;
+			}
+		): ActionResult<{ phase?: string; verificationId?: string; expiresIn?: number }> => {
+			return request<{ phase?: string; verificationId?: string; expiresIn?: number }>("/@/reach/email/register", {
 				method: "POST",
-				body: JSON.stringify({ email, password, name, challengeToken, challengeAnswer })
+				body: JSON.stringify(payload)
 			});
 		},
 		emailLogin: async ({ email, password }: { email: string; password: string }): ActionResult<void> => {
@@ -413,10 +440,31 @@ export const actions = {
 	},
 
 	email: {
-		verify: async ({ locale, address }: { locale: string; address?: string | null }): ActionResult<void> => {
-			return request<void>("/@/email/verify", {
+		verify: async ({ locale, address }: { locale: string; address?: string | null }): ActionResult<{
+			phase?: string;
+			verificationId?: string;
+			email?: string;
+			state?: string;
+			expiresIn?: number;
+		}> => {
+			return request<{
+				phase?: string;
+				verificationId?: string;
+				email?: string;
+				state?: string;
+				expiresIn?: number;
+			}>("/@/email/verify", {
 				method: "POST",
 				body: JSON.stringify({ locale, address })
+			});
+		},
+		confirm: async ({ verificationId, code }: { verificationId: string; code: string }): ActionResult<{
+			email?: string;
+			state?: string;
+		}> => {
+			return request<{ email?: string; state?: string }>("/@/email/confirm", {
+				method: "POST",
+				body: JSON.stringify({ verificationId, code })
 			});
 		},
 		remove: async (): ActionResult<void> => {

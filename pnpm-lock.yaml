@@ -74,6 +74,9 @@ importers:
       '@tuyuritio/shiki-code-copy':
         specifier: ^1.0.0
         version: 1.0.0(shiki@3.22.0)
+      altcha-lib:
+        specifier: ^1.4.1
+        version: 1.4.1
       arctic:
         specifier: ^3.7.0
         version: 3.7.0
@@ -2640,6 +2643,9 @@ packages:
 
   ajv@8.18.0:
     resolution: {integrity: sha512-PlXPeEWMXMZ7sPYOHqmDyCJzcfNrUr3fGNKtezX14ykXOEIvyK81d+qydx89KY5O71FKMPaQ2vBfBFI5NHR63A==}
+
+  altcha-lib@1.4.1:
+    resolution: {integrity: sha512-MAXP9tkQOA2SE9Gwoe3LAcZbcDpp3XzYc5GDVej/y3eMNaFG/eVnRY1/7SGFW0RPsViEjPf+hi5eANjuZrH1xA==}
 
   ansi-align@3.0.1:
     resolution: {integrity: sha512-IOfwwBF5iczOjp/WeY4YxyjqAFMQoZufdQWDd19SEExbVLNXqvpzSJ/M7Za4/sCPmQ0+GRquoA7bGcINcxew6w==}
@@ -8613,6 +8619,8 @@ snapshots:
       fast-uri: 3.1.0
       json-schema-traverse: 1.0.0
       require-from-string: 2.0.2
+
+  altcha-lib@1.4.1: {}
 
   ansi-align@3.0.1:
     dependencies:

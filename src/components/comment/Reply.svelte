@@ -3,6 +3,7 @@ import { actions, type ActionErrorLike } from "./actions.client";
 import { onMount, untrack } from "svelte";
 import { slide } from "svelte/transition";
 import { Turnstile } from "svelte-turnstile";
+import { solveChallenge } from "altcha-lib";
 import remark from "$utils/remark";
 import Icon from "$components/Icon.svelte";
 import Modal from "$components/Modal.svelte";
@@ -11,6 +12,14 @@ import config from "$config";
 import i18nit from "$i18n";
 import Drifter from "./Drifter.svelte";
 import context, { countdownComment } from "./context.svelte";
+
+type HumanChallenge = {
+	algorithm: string;
+	challenge: string;
+	salt: string;
+	signature: string;
+	maxnumber?: number;
+};
 
 let {
 	section,
@@ -54,9 +63,12 @@ let emailAuthAddress: string = $state("");
 let emailAuthPassword: string = $state("");
 let emailAuthPasswordConfirm: string = $state("");
 let emailAuthPending: boolean = $state(false);
-let humanQuestion: string = $state("");
-let humanToken: string = $state("");
-let humanAnswer: string = $state("");
+let registerHumanChallenge: HumanChallenge | null = $state(null);
+let registerHumanPayload: Record<string, unknown> | null = $state(null);
+let registerHumanVerifying: boolean = $state(false);
+let emailAuthVerificationId: string = $state("");
+let emailAuthCode: string = $state("");
+let emailAuthCodeSent: boolean = $state(false);
 
 // Generate storage key
 const DRAFT_PREFIX = "comment-draft:";
@@ -125,6 +137,68 @@ function insertEmoji(emoji: string) {
 	}
 }
 
+async function solveHumanPayload(challenge: HumanChallenge): Promise<Record<string, unknown> | null> {
+	const max = Number(challenge.maxnumber ?? 100000);
+	const task = solveChallenge(challenge.challenge, challenge.salt, challenge.algorithm, max);
+	const solved = await task.promise;
+	if (!solved) return null;
+
+	return {
+		algorithm: challenge.algorithm,
+		challenge: challenge.challenge,
+		salt: challenge.salt,
+		signature: challenge.signature,
+		number: solved.number
+	};
+}
+
+async function loadHumanChallenge() {
+	const { data, error } = await actions.auth.humanChallenge();
+	if (!error) {
+		registerHumanChallenge = data.challenge;
+		registerHumanPayload = null;
+	} else {
+		registerHumanChallenge = null;
+		registerHumanPayload = null;
+	}
+}
+
+async function verifyRegisterHuman() {
+	if (registerHumanVerifying || emailAuthPending) return;
+	if (!registerHumanChallenge) await loadHumanChallenge();
+	if (!registerHumanChallenge) {
+		pushTip("warning", t("oauth.email.human.failure"));
+		return;
+	}
+
+	registerHumanVerifying = true;
+	try {
+		const payload = await solveHumanPayload(registerHumanChallenge);
+		if (!payload) {
+			registerHumanPayload = null;
+			pushTip("warning", t("oauth.email.human.failure"));
+			return;
+		}
+		registerHumanPayload = payload;
+		pushTip("success", t("oauth.email.human.done"));
+	} catch {
+		registerHumanPayload = null;
+		pushTip("warning", t("oauth.email.human.failure"));
+	} finally {
+		registerHumanVerifying = false;
+	}
+}
+
+async function solveCommentHumanPayload(): Promise<Record<string, unknown> | null> {
+	const { data, error } = await actions.auth.humanChallenge();
+	if (error) return null;
+	try {
+		return await solveHumanPayload(data.challenge);
+	} catch {
+		return null;
+	}
+}
+
 /**
  * Create or edit comment with validation and rate limiting
  */
@@ -167,7 +241,7 @@ async function submit() {
 		({ error } = await actions.comment.edit({ id: edit, content }));
 	} else {
 		// For authenticated users creating a comment
-		({ error } = await actions.comment.create({
+		let result = await actions.comment.create({
 			locale: context.locale,
 			section: section,
 			item: item,
@@ -175,7 +249,29 @@ async function submit() {
 			content,
 			link: link,
 			push: context.subscription
-		}));
+		});
+		error = result.error;
+
+		if (error?.code === "human_verification_required") {
+			pushTip("information", t("oauth.email.human.processing"));
+			const payload = await solveCommentHumanPayload();
+			if (!payload) {
+				pushTip("warning", t("oauth.email.human.failure"));
+				return;
+			}
+
+			result = await actions.comment.create({
+				locale: context.locale,
+				section: section,
+				item: item,
+				reply,
+				content,
+				link: link,
+				push: context.subscription,
+				passer: { captchaPayload: payload }
+			});
+			error = result.error;
+		}
 	}
 
 	if (!error) {
@@ -212,22 +308,14 @@ async function submit() {
 	}
 }
 
-async function loadHumanChallenge() {
-	const { data, error } = await actions.auth.humanChallenge();
-	if (!error) {
-		humanQuestion = data.question;
-		humanToken = data.token;
-		humanAnswer = "";
-	} else {
-		humanQuestion = "";
-		humanToken = "";
-	}
-}
-
 async function switchEmailAuthMode(mode: "login" | "register") {
 	emailAuthMode = mode;
 	emailAuthPassword = "";
 	emailAuthPasswordConfirm = "";
+	emailAuthCode = "";
+	emailAuthVerificationId = "";
+	emailAuthCodeSent = false;
+	registerHumanPayload = null;
 	if (mode === "register") await loadHumanChallenge();
 }
 
@@ -237,66 +325,154 @@ async function submitEmailAuth() {
 	const email = emailAuthAddress.trim();
 	const password = emailAuthPassword;
 	if (!email) return pushTip("warning", t("email.empty"));
-	if (!password.trim()) return pushTip("warning", t("oauth.email.password.empty"));
-
-	if (emailAuthMode === "register") {
-		if (password !== emailAuthPasswordConfirm) return pushTip("warning", t("oauth.email.password.mismatch"));
-		if (!humanToken || !humanAnswer.trim()) return pushTip("warning", t("oauth.email.human.empty"));
-	}
+	if (emailAuthMode === "login" && !password.trim()) return pushTip("warning", t("oauth.email.password.empty"));
 
 	emailAuthPending = true;
-	const result =
-		emailAuthMode === "register"
-			? await actions.auth.emailRegister({
-					email,
-					password,
-					name: emailAuthName.trim() || undefined,
-					challengeToken: humanToken,
-					challengeAnswer: humanAnswer.trim()
-			  })
-			: await actions.auth.emailLogin({ email, password });
+
+	if (emailAuthMode === "register") {
+		if (!emailAuthCodeSent) {
+			if (!password.trim()) {
+				emailAuthPending = false;
+				return pushTip("warning", t("oauth.email.password.empty"));
+			}
+			if (password !== emailAuthPasswordConfirm) {
+				emailAuthPending = false;
+				return pushTip("warning", t("oauth.email.password.mismatch"));
+			}
+			if (!registerHumanPayload) {
+				emailAuthPending = false;
+				return pushTip("warning", t("oauth.email.human.empty"));
+			}
+
+			const result = await actions.auth.emailRegister({
+				email,
+				password,
+				name: emailAuthName.trim() || undefined,
+				captchaPayload: registerHumanPayload
+			});
+			emailAuthPending = false;
+
+			if (!result.error) {
+				if (result.data?.phase === "code_sent" && result.data?.verificationId) {
+					emailAuthCodeSent = true;
+					emailAuthVerificationId = result.data.verificationId;
+					pushTip("information", t("oauth.email.register.code.sent"));
+					return;
+				}
+				pushTip("success", t("oauth.email.register.success"));
+				reachView = false;
+				location.reload();
+				return;
+			}
+
+			switch (result.error.code) {
+				case "CONFLICT":
+				case "email_exists":
+					pushTip("warning", t("oauth.email.register.conflict"));
+					break;
+
+				case "TOO_MANY_REQUESTS":
+				case "too_many_requests":
+					pushTip("error", t("comment.limit"));
+					break;
+
+				case "ip_account_limit":
+					pushTip("warning", t("oauth.email.register.ip_limit"));
+					break;
+
+				case "mail_not_configured":
+					pushTip("error", t("oauth.email.common.mail_unavailable"));
+					break;
+
+				case "invalid_email":
+				case "invalid_password":
+					pushTip("warning", t("oauth.email.input.invalid"));
+					break;
+
+				case "human_verification_failed":
+					pushTip("warning", t("oauth.email.human.failure"));
+					registerHumanPayload = null;
+					await loadHumanChallenge();
+					break;
+
+				default:
+					pushTip("error", t("oauth.email.common.failure"));
+					break;
+			}
+			return;
+		}
+
+		const code = emailAuthCode.trim();
+		if (!emailAuthVerificationId || !/^\d{5}$/.test(code)) {
+			emailAuthPending = false;
+			pushTip("warning", t("oauth.email.register.code.invalid"));
+			return;
+		}
+
+		const confirm = await actions.auth.emailRegister({
+			verificationId: emailAuthVerificationId,
+			code
+		});
+		emailAuthPending = false;
+
+		if (!confirm.error) {
+			pushTip("success", t("oauth.email.register.success"));
+			reachView = false;
+			location.reload();
+			return;
+		}
+
+		switch (confirm.error.code) {
+			case "verification_code_expired":
+				pushTip("warning", t("oauth.email.register.code.expired"));
+				emailAuthCodeSent = false;
+				emailAuthVerificationId = "";
+				emailAuthCode = "";
+				registerHumanPayload = null;
+				await loadHumanChallenge();
+				break;
+
+			case "verification_code_used":
+			case "verification_code_exhausted":
+			case "invalid_verification_code":
+				pushTip("warning", t("oauth.email.register.code.invalid"));
+				break;
+
+			case "ip_account_limit":
+				pushTip("warning", t("oauth.email.register.ip_limit"));
+				break;
+
+			case "CONFLICT":
+			case "email_exists":
+				pushTip("warning", t("oauth.email.register.conflict"));
+				break;
+
+			default:
+				pushTip("error", t("oauth.email.common.failure"));
+				break;
+		}
+		return;
+	}
+
+	const result = await actions.auth.emailLogin({ email, password });
 	emailAuthPending = false;
 
 	if (!result.error) {
-		pushTip("success", t(emailAuthMode === "register" ? "oauth.email.register.success" : "oauth.email.login.success"));
+		pushTip("success", t("oauth.email.login.success"));
 		reachView = false;
 		location.reload();
 		return;
 	}
 
 	switch (result.error.code) {
-		case "CONFLICT":
-		case "email_exists":
-			pushTip("warning", t("oauth.email.register.conflict"));
-			break;
-
 		case "UNAUTHORIZED":
 		case "invalid_credentials":
 			pushTip("error", t("oauth.email.login.failure"));
 			break;
 
-		case "TOO_MANY_REQUESTS":
-		case "too_many_requests":
-			pushTip("error", t("comment.limit"));
-			break;
-
 		case "invalid_email":
 		case "invalid_password":
 			pushTip("warning", t("oauth.email.input.invalid"));
-			break;
-
-		case "human_verification_failed":
-			pushTip("warning", t("oauth.email.human.failure"));
-			await loadHumanChallenge();
-			break;
-
-		case "BAD_REQUEST":
-			if (emailAuthMode === "register") {
-				pushTip("warning", t("oauth.email.human.failure"));
-				await loadHumanChallenge();
-			} else {
-				pushTip("warning", t("oauth.email.input.invalid"));
-			}
 			break;
 
 		default:
@@ -413,11 +589,24 @@ onMount(() => {
 			{#if emailAuthMode === "register"}
 				<input type="text" class="input w-full" placeholder={t("oauth.email.name.placeholder")} bind:value={emailAuthName} />
 				<input type="password" class="input w-full" placeholder={t("oauth.email.password.confirm")} bind:value={emailAuthPasswordConfirm} />
-				<label class="w-full text-sm">{t("oauth.email.human.question", { question: humanQuestion || "..." })}</label>
-				<div class="flex w-full gap-2">
-					<input type="text" class="input grow" placeholder={t("oauth.email.human.placeholder")} bind:value={humanAnswer} />
-					<button class="form-button" disabled={emailAuthPending} onclick={loadHumanChallenge}><Icon name="lucide--refresh-cw" /></button>
+
+				<div class="flex w-full gap-2 items-center">
+					<button class="form-button grow" disabled={emailAuthPending || registerHumanVerifying} onclick={verifyRegisterHuman}>
+						{#if registerHumanVerifying}
+							<span class="flex items-center justify-center"><Icon name="svg-spinners--ring-resize" /></span>
+						{:else if registerHumanPayload}
+							{t("oauth.email.human.done")}
+						{:else}
+							{t("oauth.email.human.verify")}
+						{/if}
+					</button>
+					<button class="form-button" disabled={emailAuthPending || registerHumanVerifying} onclick={loadHumanChallenge}><Icon name="lucide--refresh-cw" /></button>
 				</div>
+
+				{#if emailAuthCodeSent}
+					<input type="text" class="input w-full" maxlength="5" placeholder={t("oauth.email.register.code.placeholder")} bind:value={emailAuthCode} />
+					<p class="w-full text-xs text-weak">{t("oauth.email.register.code.sent")}</p>
+				{/if}
 			{/if}
 
 			<button class="text-sm underline-offset-2 hover:underline self-start" disabled={emailAuthPending} onclick={() => switchEmailAuthMode(emailAuthMode === "register" ? "login" : "register")}>
@@ -429,14 +618,18 @@ onMount(() => {
 			</button>
 
 			<div class="flex items-center justify-between w-full">
-				<button class="form-button" disabled={emailAuthPending} onclick={submitEmailAuth}>
+				<button class="form-button" disabled={emailAuthPending || registerHumanVerifying} onclick={submitEmailAuth}>
 					{#if emailAuthMode === "register"}
-						{t("oauth.email.register.name")}
+						{#if emailAuthCodeSent}
+							{t("oauth.email.register.confirm")}
+						{:else}
+							{t("oauth.email.register.name")}
+						{/if}
 					{:else}
 						{t("oauth.email.login.name")}
 					{/if}
 				</button>
-				<button class="form-button" disabled={emailAuthPending} onclick={() => (reachView = false)}>{t("cancel")}</button>
+				<button class="form-button" disabled={emailAuthPending || registerHumanVerifying} onclick={() => (reachView = false)}>{t("cancel")}</button>
 			</div>
 		</div>
 	</div>
