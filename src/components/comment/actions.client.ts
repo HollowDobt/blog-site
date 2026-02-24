@@ -210,18 +210,43 @@ function normalizeCommentItemKey(item: string): string {
 	return cleaned || item;
 }
 
+function toPostKey(section: string, item: string): string {
+	return `${section}:${normalizeCommentItemKey(item)}`;
+}
+
 const unsupported = async <T>(): ActionResult<T> => fail("NOT_SUPPORTED");
 
 export const actions = {
 	comment: {
 		list: async ({ section, item }: { section: string; item: string }): ActionResult<{ count: number; treeification: CommentNode[] }> => {
-			const query = new URLSearchParams({ section, item: normalizeCommentItemKey(item) }).toString();
-			const response = await request<Record<string, unknown>>(`/@/comments?${query}`);
+			const normalizedItem = normalizeCommentItemKey(item);
+			const postKey = toPostKey(section, normalizedItem);
+
+			let response = await request<Record<string, unknown>>(`/@/comments?${new URLSearchParams({ postKey }).toString()}`);
+			if (response.error) {
+				const fallbackQuery = new URLSearchParams({ section, item: normalizedItem }).toString();
+				response = await request<Record<string, unknown>>(`/@/comments?${fallbackQuery}`);
+			}
 			if (response.error) return response;
 
 			const data = response.data;
 			const sourceTree = data.treeification ?? data.comments ?? data.items ?? [];
-			const treeification = Array.isArray(sourceTree) ? sourceTree.map(normalizeComment) : [];
+			const normalized = Array.isArray(sourceTree) ? sourceTree.map(normalizeComment) : [];
+			let treeification = normalized;
+
+			// If backend returns a flat array, build tree by `reply`.
+			if (normalized.length && normalized.every(node => node.subcomments.length === 0)) {
+				const nodeMap = new Map(normalized.map(node => [node.id, { ...node, subcomments: [] as CommentNode[] }]));
+				const roots: CommentNode[] = [];
+				for (const node of nodeMap.values()) {
+					if (node.reply && nodeMap.has(node.reply)) {
+						nodeMap.get(node.reply)!.subcomments.push(node);
+					} else {
+						roots.push(node);
+					}
+				}
+				treeification = roots;
+			}
 			const countValue = Number(data.count ?? data.total ?? countNodes(treeification));
 
 			return ok({
@@ -249,7 +274,8 @@ export const actions = {
 			push?: number;
 			passer?: { nickname?: string | null; captcha?: string | null };
 		}): ActionResult<void> => {
-			const body: Record<string, unknown> = { section, item: normalizeCommentItemKey(item), reply, content, link };
+			const normalizedItem = normalizeCommentItemKey(item);
+			const body: Record<string, unknown> = { postKey: toPostKey(section, normalizedItem), section, item: normalizedItem, reply, content, link };
 			if (locale) body.locale = locale;
 			if (push != null) body.push = push;
 			if (passer?.nickname) body.nickname = passer.nickname;
