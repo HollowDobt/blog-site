@@ -53,23 +53,32 @@ async function signout() {
 	location.href = `/@/depart?next=${encodeURIComponent(`${location.pathname}${location.search}${location.hash}`)}`;
 }
 
+async function cleanupPushSubscription() {
+	try {
+		if (!("serviceWorker" in navigator)) return;
+		const registration = await Promise.race([
+			navigator.serviceWorker.getRegistration(),
+			new Promise<ServiceWorkerRegistration | undefined>(resolve => setTimeout(() => resolve(undefined), 800))
+		]);
+		if (!registration) return;
+
+		const subscription = await registration.pushManager.getSubscription();
+		if (subscription) await subscription.unsubscribe();
+	} catch {
+		// Ignore cleanup failures. Logout redirect must not be blocked.
+	}
+}
+
 /**
  * Permanently deactivate user account and clean up data
  */
 async function deactivate() {
 	const { error } = await actions.drifter.deactivate();
 	if (!error) {
-		// Clean up push notification subscription before account deletion
-		const registration = await navigator.serviceWorker.ready;
-		let subscription = await registration.pushManager.getSubscription();
-		if (subscription) await subscription.unsubscribe();
-
 		pushTip("success", t("drifter.deactivate.success"));
-		// Force top-level logout redirect to clear any residual cookie state.
-		setTimeout(
-			() => (location.href = `/@/depart?next=${encodeURIComponent(`${location.pathname}${location.search}${location.hash}`)}`),
-			600
-		);
+		void cleanupPushSubscription();
+		location.href = `/@/depart?next=${encodeURIComponent(`${location.pathname}${location.search}${location.hash}`)}`;
+		return;
 	} else {
 		pushTip("error", t("drifter.deactivate.failure"));
 	}
