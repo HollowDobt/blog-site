@@ -15,7 +15,6 @@ import CJK from "remark-cjk-friendly";
 import CJKStrikethrough from "remark-cjk-friendly-gfm-strikethrough";
 import ruby from "@tuyuritio/remark-ruby";
 import attr from "@tuyuritio/remark-attribute";
-import math from "remark-math";
 import gemoji from "remark-gemoji";
 import footnote from "remark-footnotes-extra";
 import abbr from "@tuyuritio/remark-abbreviation";
@@ -24,7 +23,6 @@ import alerts from "@tuyuritio/remark-github-alert";
 import { rehypeHeadingIds as ids } from "@astrojs/markdown-remark";
 import anchor from "rehype-autolink-headings";
 import links from "rehype-external-links";
-import katex from "rehype-katex";
 import figure from "@tuyuritio/rehype-image-figure";
 import wrapper from "@tuyuritio/rehype-table-wrapper";
 import sectionize from "@hbsnow/rehype-sectionize";
@@ -55,7 +53,6 @@ export default defineConfig({
 			[CJKStrikethrough, { singleTilde: false }],
 			ruby,
 			attr,
-			math,
 			gemoji,
 			footnote,
 			abbr,
@@ -77,7 +74,6 @@ export default defineConfig({
 			ids,
 			[anchor, { behavior: "wrap" }],
 			[links, { target: "_blank", rel: ["nofollow", "noopener", "noreferrer"] }],
-			katex,
 			figure,
 			wrapper,
 			sectionize

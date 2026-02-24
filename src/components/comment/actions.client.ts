@@ -214,8 +214,6 @@ function toPostKey(section: string, item: string): string {
 	return `${section}:${normalizeCommentItemKey(item)}`;
 }
 
-const unsupported = async <T>(): ActionResult<T> => fail("NOT_SUPPORTED");
-
 export const actions = {
 	comment: {
 		list: async ({ section, item }: { section: string; item: string }): ActionResult<{ count: number; treeification: CommentNode[] }> => {
@@ -344,9 +342,22 @@ export const actions = {
 			});
 		},
 
-		synchronize: unsupported,
-		update: unsupported,
-		deactivate: unsupported,
+		synchronize: async (): ActionResult<{ name: string; description: string | null; image?: string | null }> => {
+			return request<{ name: string; description: string | null; image?: string | null }>("/@/drifter/synchronize", {
+				method: "POST"
+			});
+		},
+		update: async ({ homepage, notify }: { homepage: string | null; notify: boolean }): ActionResult<void> => {
+			return request<void>("/@/drifter/update", {
+				method: "POST",
+				body: JSON.stringify({ homepage, notify })
+			});
+		},
+		deactivate: async (): ActionResult<void> => {
+			return request<void>("/@/drifter/deactivate", {
+				method: "POST"
+			});
+		},
 		depart: async (): ActionResult<void> => {
 			return request<void>("/@/depart", { method: "POST" });
 		}

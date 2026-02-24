@@ -38,6 +38,29 @@ const { locale, title, subtitle, description, author, article } = Astro.props;
 		<link rel="sitemap" href="/sitemap-index.xml" />
 
 		{turnstile && [<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onloadTurnstileCallback" async defer data-swup-ignore-script is:inline />]}
+		<script is:inline>
+			window.MathJax = {
+				tex: {
+					inlineMath: [
+						["$", "$"],
+						["\\(", "\\)"]
+					],
+					displayMath: [
+						["$$", "$$"],
+						["\\[", "\\]"]
+					],
+					processEscapes: true
+				},
+				options: {
+					skipHtmlTags: ["script", "noscript", "style", "textarea", "pre", "code"]
+				}
+			};
+
+			document.addEventListener("astro:page-load", () => {
+				if (window.MathJax?.typesetPromise) window.MathJax.typesetPromise();
+			});
+		</script>
+		<script src="https://cdn.jsdelivr.net/npm/mathjax@4.1.0/tex-chtml.js" async data-swup-ignore-script is:inline />
 
 		<script is:inline>
 			var theme = localStorage.getItem("theme");
