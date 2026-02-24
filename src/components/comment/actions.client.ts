@@ -364,10 +364,25 @@ export const actions = {
 	},
 
 	auth: {
-		emailRegister: async ({ email, password, name }: { email: string; password: string; name?: string | null }): ActionResult<void> => {
+		humanChallenge: async (): ActionResult<{ token: string; question: string }> => {
+			return request<{ token: string; question: string }>("/@/human/challenge");
+		},
+		emailRegister: async ({
+			email,
+			password,
+			name,
+			challengeToken,
+			challengeAnswer
+		}: {
+			email: string;
+			password: string;
+			name?: string | null;
+			challengeToken: string;
+			challengeAnswer: string;
+		}): ActionResult<void> => {
 			return request<void>("/@/reach/email/register", {
 				method: "POST",
-				body: JSON.stringify({ email, password, name })
+				body: JSON.stringify({ email, password, name, challengeToken, challengeAnswer })
 			});
 		},
 		emailLogin: async ({ email, password }: { email: string; password: string }): ActionResult<void> => {

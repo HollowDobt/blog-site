@@ -11,7 +11,7 @@ interface Props {
 }
 
 const { locale, link, section, item, compact } = Astro.props;
-const oauthProviders = oauth.length ? oauth : [{ name: "GitHub", logo: "simple-icons--github" }];
+const oauthProviders = oauth;
 ---
 
 <!-- Wrapping component to inject server-side environment variables -->

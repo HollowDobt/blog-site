@@ -158,8 +158,15 @@ oauth:
       placeholder: 電子書簡を入力
     name:
       placeholder: 表示名を入力（任意）
+    human:
+      question: 人間認証：{question}
+      placeholder: 計算結果を入力
+      empty: 人間認証を完了してください
+      failure: 人間認証に失敗しました。再試行してください
     password:
       empty: 密碼は必須です
+      mismatch: 2回入力した密碼が一致しません
+      confirm: 密碼を再入力
       placeholder: 密碼を入力
     input:
       invalid: 電子書簡または密碼の形式が正しくありません

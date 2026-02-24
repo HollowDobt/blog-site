@@ -38,6 +38,7 @@ let limit = $derived(context.limitComment);
 
 /** Comment input is enabled only when it's authenticated or Turnstile is configured */
 const enabled: boolean = Boolean(context.turnstile || context.drifter);
+const hasSigninOption = true;
 
 let reachView: boolean = $state(false); // OAuth signin view state
 let profileView: boolean = $state(false); // User profile view state
@@ -51,7 +52,11 @@ let emailAuthMode: "login" | "register" = $state("login");
 let emailAuthName: string = $state("");
 let emailAuthAddress: string = $state("");
 let emailAuthPassword: string = $state("");
+let emailAuthPasswordConfirm: string = $state("");
 let emailAuthPending: boolean = $state(false);
+let humanQuestion: string = $state("");
+let humanToken: string = $state("");
+let humanAnswer: string = $state("");
 
 // Generate storage key
 const DRAFT_PREFIX = "comment-draft:";
@@ -207,6 +212,25 @@ async function submit() {
 	}
 }
 
+async function loadHumanChallenge() {
+	const { data, error } = await actions.auth.humanChallenge();
+	if (!error) {
+		humanQuestion = data.question;
+		humanToken = data.token;
+		humanAnswer = "";
+	} else {
+		humanQuestion = "";
+		humanToken = "";
+	}
+}
+
+async function switchEmailAuthMode(mode: "login" | "register") {
+	emailAuthMode = mode;
+	emailAuthPassword = "";
+	emailAuthPasswordConfirm = "";
+	if (mode === "register") await loadHumanChallenge();
+}
+
 async function submitEmailAuth() {
 	if (emailAuthPending) return;
 
@@ -215,13 +239,20 @@ async function submitEmailAuth() {
 	if (!email) return pushTip("warning", t("email.empty"));
 	if (!password.trim()) return pushTip("warning", t("oauth.email.password.empty"));
 
+	if (emailAuthMode === "register") {
+		if (password !== emailAuthPasswordConfirm) return pushTip("warning", t("oauth.email.password.mismatch"));
+		if (!humanToken || !humanAnswer.trim()) return pushTip("warning", t("oauth.email.human.empty"));
+	}
+
 	emailAuthPending = true;
 	const result =
 		emailAuthMode === "register"
 			? await actions.auth.emailRegister({
 					email,
 					password,
-					name: emailAuthName.trim() || undefined
+					name: emailAuthName.trim() || undefined,
+					challengeToken: humanToken,
+					challengeAnswer: humanAnswer.trim()
 			  })
 			: await actions.auth.emailLogin({ email, password });
 	emailAuthPending = false;
@@ -235,15 +266,37 @@ async function submitEmailAuth() {
 
 	switch (result.error.code) {
 		case "CONFLICT":
+		case "email_exists":
 			pushTip("warning", t("oauth.email.register.conflict"));
 			break;
 
 		case "UNAUTHORIZED":
+		case "invalid_credentials":
 			pushTip("error", t("oauth.email.login.failure"));
 			break;
 
-		case "BAD_REQUEST":
+		case "TOO_MANY_REQUESTS":
+		case "too_many_requests":
+			pushTip("error", t("comment.limit"));
+			break;
+
+		case "invalid_email":
+		case "invalid_password":
 			pushTip("warning", t("oauth.email.input.invalid"));
+			break;
+
+		case "human_verification_failed":
+			pushTip("warning", t("oauth.email.human.failure"));
+			await loadHumanChallenge();
+			break;
+
+		case "BAD_REQUEST":
+			if (emailAuthMode === "register") {
+				pushTip("warning", t("oauth.email.human.failure"));
+				await loadHumanChallenge();
+			} else {
+				pushTip("warning", t("oauth.email.input.invalid"));
+			}
 			break;
 
 		default:
@@ -339,24 +392,42 @@ onMount(() => {
 
 		<hr class="border-0 border-b border-dashed w-full" />
 
-		<div class="flex flex-col items-center gap-2">
-			{#each context.oauth as provider}
-				<a href={`/@/reach/${provider.name.toLowerCase()}`} class="flex items-center justify-center gap-2 w-full border-2 border-secondary py-1 px-2 rounded">
-					<Icon size="0.95rem" name={provider.logo} />
-					<span class="font-bold text-sm">{t("oauth.signin", { provider: provider.name })}</span>
-				</a>
-			{/each}
-		</div>
+		{#if context.oauth.length}
+			<div class="flex flex-col items-center gap-2">
+				{#each context.oauth as provider}
+					<a href={`/@/reach/${provider.name.toLowerCase()}`} class="flex items-center justify-center gap-2 w-full border-2 border-secondary py-1 px-2 rounded">
+						<Icon size="0.95rem" name={provider.logo} />
+						<span class="font-bold text-sm">{t("oauth.signin", { provider: provider.name })}</span>
+					</a>
+				{/each}
+			</div>
 
-		<hr class="border-0 border-b border-dashed w-full" />
+			<hr class="border-0 border-b border-dashed w-full" />
+		{/if}
 
 		<div class="flex flex-col items-center gap-2 w-full">
 			<p class="font-bold text-sm">{t("oauth.email.title")}</p>
+			<input type="email" class="input w-full" placeholder={t("oauth.email.address.placeholder")} bind:value={emailAuthAddress} />
+			<input type="password" class="input w-full font-mono" style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;" placeholder={t("oauth.email.password.placeholder")} bind:value={emailAuthPassword} />
+
 			{#if emailAuthMode === "register"}
 				<input type="text" class="input w-full" placeholder={t("oauth.email.name.placeholder")} bind:value={emailAuthName} />
+				<input type="password" class="input w-full font-mono" style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;" placeholder={t("oauth.email.password.confirm")} bind:value={emailAuthPasswordConfirm} />
+				<label class="w-full text-sm">{t("oauth.email.human.question", { question: humanQuestion || "..." })}</label>
+				<div class="flex w-full gap-2">
+					<input type="text" class="input grow" placeholder={t("oauth.email.human.placeholder")} bind:value={humanAnswer} />
+					<button class="form-button" disabled={emailAuthPending} onclick={loadHumanChallenge}><Icon name="lucide--refresh-cw" /></button>
+				</div>
 			{/if}
-			<input type="email" class="input w-full" placeholder={t("oauth.email.address.placeholder")} bind:value={emailAuthAddress} />
-			<input type="password" class="input w-full" placeholder={t("oauth.email.password.placeholder")} bind:value={emailAuthPassword} />
+
+			<button class="text-sm underline-offset-2 hover:underline self-start" disabled={emailAuthPending} onclick={() => switchEmailAuthMode(emailAuthMode === "register" ? "login" : "register")}>
+				{#if emailAuthMode === "register"}
+					{t("oauth.email.login.switch")}
+				{:else}
+					{t("oauth.email.register.switch")}
+				{/if}
+			</button>
+
 			<div class="flex items-center justify-between w-full">
 				<button class="form-button" disabled={emailAuthPending} onclick={submitEmailAuth}>
 					{#if emailAuthMode === "register"}
@@ -365,17 +436,9 @@ onMount(() => {
 						{t("oauth.email.login.name")}
 					{/if}
 				</button>
-				<button class="text-sm underline-offset-2 hover:underline" onclick={() => (emailAuthMode = emailAuthMode === "register" ? "login" : "register")}>
-					{#if emailAuthMode === "register"}
-						{t("oauth.email.login.switch")}
-					{:else}
-						{t("oauth.email.register.switch")}
-					{/if}
-				</button>
+				<button class="form-button" disabled={emailAuthPending} onclick={() => (reachView = false)}>{t("cancel")}</button>
 			</div>
 		</div>
-
-		<button class="form-button" onclick={() => (reachView = false)}>{t("cancel")}</button>
 	</div>
 </Modal>
 
@@ -384,7 +447,7 @@ onMount(() => {
 <main transition:slide={{ duration: 150 }} class="relative mt-5">
 	{#if !enabled}
 		<div class="absolute flex flex-col items-center justify-center gap-1 w-full h-full font-bold cursor-not-allowed">
-			{#if !context.oauth.length}
+			{#if !hasSigninOption}
 				<span class="text-xl font-bold">{t("comment.disabled")}</span>
 			{:else}
 				<button onclick={() => (reachView = true)} class="border-2 py-1 px-2 rounded-sm font-bold">{t("comment.signin")}</button>
@@ -433,7 +496,7 @@ onMount(() => {
 						<Turnstile siteKey={context.turnstile} bind:reset={resetTurnstile} on:expired={() => (captcha = undefined)} on:error={() => (captcha = undefined)} on:callback={({ detail }) => (captcha = detail.token)} />
 					{/if}
 					<input type="text" placeholder={t("comment.nickname.name")} bind:value={nickname} class="input border-weak w-35 text-sm" />
-					{#if context.oauth.length}
+					{#if hasSigninOption}
 						<button onclick={() => (reachView = true)}><Icon name="lucide--user-round" title={t("drifter.signin")} /></button>
 					{/if}
 				{/if}

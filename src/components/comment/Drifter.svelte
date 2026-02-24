@@ -50,8 +50,7 @@ async function update() {
 let deactivateView = $state(false);
 
 async function signout() {
-	const { error } = await actions.drifter.depart();
-	if (!error) location.reload();
+	location.href = `/@/depart?next=${encodeURIComponent(`${location.pathname}${location.search}${location.hash}`)}`;
 }
 
 /**

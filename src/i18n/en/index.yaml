@@ -164,8 +164,15 @@ oauth:
       placeholder: Enter email address
     name:
       placeholder: Enter display name (optional)
+    human:
+      question: "Human verification: {question}"
+      placeholder: Enter result
+      empty: Complete human verification first
+      failure: Human verification failed, please retry
     password:
       empty: Password cannot be empty
+      mismatch: Password confirmation does not match
+      confirm: Enter password again
       placeholder: Enter password
     input:
       invalid: Invalid email or password format
