@@ -65,8 +65,8 @@ async function deactivate() {
 		if (subscription) await subscription.unsubscribe();
 
 		pushTip("success", t("drifter.deactivate.success"));
-		// Redirect to home page after account deactivation
-		setTimeout(() => (location.href = "/"), 2000);
+		// Force top-level logout redirect to clear any residual cookie state.
+		setTimeout(() => (location.href = "/@/depart?next=/"), 600);
 	} else {
 		pushTip("error", t("drifter.deactivate.failure"));
 	}
