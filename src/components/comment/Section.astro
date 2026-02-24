@@ -1,0 +1,285 @@
+---
+interface Props {
+	locale: string;
+	link: string;
+	section: string;
+	item: string;
+	compact?: boolean;
+}
+
+const { section, item, compact = false } = Astro.props;
+const postKey = `${section}:${item}`;
+---
+
+<section class="tl-comment-widget" data-comment-widget data-post-key={postKey} data-compact={compact ? "1" : "0"}>
+	<div class="tl-comment-toolbar">
+		<strong>Thoughts</strong>
+		<span data-comment-status>Loading...</span>
+	</div>
+
+	<form data-comment-form class="tl-comment-form">
+		<input data-comment-reply type="hidden" />
+		<div data-comment-nickname-wrap>
+			<input data-comment-nickname type="text" maxlength="80" placeholder="Nickname" />
+		</div>
+		<textarea data-comment-content rows="4" maxlength="500" placeholder="Write a thought..." required />
+		<div class="tl-comment-actions">
+			<span data-comment-reply-tip></span>
+			<button type="submit">Post</button>
+		</div>
+	</form>
+
+	<div data-comment-list class="tl-comment-list"></div>
+</section>
+
+<style>
+	.tl-comment-widget {
+		margin-top: 1.5rem;
+		padding: 1rem;
+		border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+		border-radius: 12px;
+	}
+
+	.tl-comment-toolbar,
+	.tl-comment-actions {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+	}
+
+	.tl-comment-form {
+		display: grid;
+		gap: 0.6rem;
+		margin-top: 0.8rem;
+	}
+
+	.tl-comment-form input,
+	.tl-comment-form textarea,
+	.tl-comment-form button {
+		border-radius: 8px;
+		border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+		background: transparent;
+		color: inherit;
+		padding: 0.55rem 0.75rem;
+	}
+
+	.tl-comment-form button {
+		cursor: pointer;
+	}
+
+	.tl-comment-list {
+		margin-top: 1rem;
+		display: grid;
+		gap: 0.75rem;
+	}
+
+	.tl-comment-item {
+		border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+		border-radius: 10px;
+		padding: 0.75rem;
+	}
+
+	.tl-comment-meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem 0.6rem;
+		font-size: 0.86rem;
+		opacity: 0.8;
+	}
+
+	.tl-comment-content {
+		margin-top: 0.45rem;
+	}
+
+	.tl-comment-ops {
+		display: flex;
+		gap: 0.5rem;
+		margin-top: 0.55rem;
+	}
+
+	.tl-comment-ops button {
+		border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+		border-radius: 6px;
+		background: transparent;
+		color: inherit;
+		cursor: pointer;
+		padding: 0.25rem 0.5rem;
+		font-size: 0.8rem;
+	}
+
+	.tl-comment-children {
+		margin-top: 0.65rem;
+		margin-left: 1rem;
+		display: grid;
+		gap: 0.65rem;
+	}
+</style>
+
+<script is:inline>
+	(() => {
+		const widgets = Array.from(document.querySelectorAll("[data-comment-widget]"));
+		for (const root of widgets) {
+			const postKey = root.dataset.postKey;
+			const compact = root.dataset.compact === "1";
+			if (!postKey) continue;
+
+			const statusEl = root.querySelector("[data-comment-status]");
+			const listEl = root.querySelector("[data-comment-list]");
+			const form = root.querySelector("[data-comment-form]");
+			const nicknameWrap = root.querySelector("[data-comment-nickname-wrap]");
+			const nicknameEl = root.querySelector("[data-comment-nickname]");
+			const contentEl = root.querySelector("[data-comment-content]");
+			const replyEl = root.querySelector("[data-comment-reply]");
+			const replyTip = root.querySelector("[data-comment-reply-tip]");
+			if (!statusEl || !listEl || !form || !nicknameWrap || !nicknameEl || !contentEl || !replyEl || !replyTip) continue;
+
+			let viewer = null;
+
+			const esc = text =>
+				String(text ?? "")
+					.replaceAll("&", "&amp;")
+					.replaceAll("<", "&lt;")
+					.replaceAll(">", "&gt;")
+					.replaceAll('"', "&quot;")
+					.replaceAll("'", "&#39;");
+
+			async function getJSON(url, init) {
+				const res = await fetch(url, init);
+				let data = {};
+				try {
+					data = await res.json();
+				} catch {}
+				if (!res.ok) throw new Error(data?.error || `HTTP ${res.status}`);
+				return data;
+			}
+
+			function setReply(id) {
+				replyEl.value = id || "";
+				replyTip.textContent = id ? `Replying to ${id}` : "";
+			}
+
+			function renderTree(items) {
+				return (items || [])
+					.map(comment => {
+						const children = comment.subcomment || comment.subcomments || [];
+						const canEdit = viewer?.id && comment?.author?.id && viewer.id === comment.author.id;
+						const deleted = comment.deleted || comment.edit === comment.ID;
+						return `
+							<div class="tl-comment-item" data-id="${esc(comment.ID)}">
+								<div class="tl-comment-meta">
+									<strong>${esc(comment.author?.name || "Guest")}</strong>
+									<span>${esc(new Date(comment.updatedAt || comment.createdAt || Date.now()).toLocaleString())}</span>
+									<span>#${esc(comment.ID || "")}</span>
+								</div>
+								<div class="tl-comment-content">${deleted ? "<i>Deleted</i>" : String(comment.html || esc(comment.content || ""))}</div>
+								<div class="tl-comment-ops">
+									<button type="button" data-op="reply" data-id="${esc(comment.ID)}">Reply</button>
+									${canEdit ? `<button type="button" data-op="edit" data-id="${esc(comment.ID)}">Edit</button><button type="button" data-op="delete" data-id="${esc(comment.ID)}">Delete</button>` : ""}
+								</div>
+								${children.length ? `<div class="tl-comment-children">${renderTree(children)}</div>` : ""}
+							</div>
+						`;
+					})
+					.join("");
+			}
+
+			async function refresh() {
+				const reach = await getJSON("/@/reach");
+				viewer = reach?.user || null;
+
+				if (viewer) {
+					statusEl.innerHTML = `Signed in as <b>${esc(viewer.name || viewer.login || "User")}</b> · <a href="#" data-op="logout">Logout</a>`;
+					nicknameWrap.style.display = "none";
+				} else {
+					const next = encodeURIComponent(location.pathname + location.search + location.hash);
+					statusEl.innerHTML = `<a href="/@/reach/github?next=${next}">Sign in with GitHub</a> or post as guest`;
+					nicknameWrap.style.display = "";
+				}
+
+				const data = await getJSON(`/@/comments?postKey=${encodeURIComponent(postKey)}`);
+				viewer = data?.viewer || viewer;
+				const comments = data?.comments || [];
+				listEl.innerHTML = comments.length ? renderTree(compact ? comments.slice(0, 5) : comments) : "<i>No thoughts yet.</i>";
+			}
+
+			form.addEventListener("submit", async event => {
+				event.preventDefault();
+				const payload = {
+					postKey,
+					content: contentEl.value.trim(),
+					nickname: nicknameEl.value.trim() || undefined,
+					reply: replyEl.value || undefined
+				};
+				if (!payload.content) return;
+				try {
+					await getJSON("/@/comments", {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify(payload)
+					});
+					contentEl.value = "";
+					setReply("");
+					await refresh();
+				} catch (error) {
+					alert(error.message || "Failed to post thought");
+				}
+			});
+
+			root.addEventListener("click", async event => {
+				const t = event.target;
+				if (!(t instanceof HTMLElement)) return;
+				const op = t.dataset.op;
+				if (!op) return;
+				event.preventDefault();
+
+				if (op === "logout") {
+					await getJSON("/@/depart", { method: "POST" });
+					await refresh();
+					return;
+				}
+
+				const id = t.dataset.id;
+				if (!id) return;
+
+				if (op === "reply") {
+					setReply(id);
+					contentEl.focus();
+					return;
+				}
+
+				if (op === "edit") {
+					const content = prompt("New content");
+					if (!content || !content.trim()) return;
+					try {
+						await getJSON(`/@/comments/${encodeURIComponent(id)}/edit`, {
+							method: "POST",
+							headers: { "Content-Type": "application/json" },
+							body: JSON.stringify({ content: content.trim() })
+						});
+						await refresh();
+					} catch (error) {
+						alert(error.message || "Failed to edit");
+					}
+					return;
+				}
+
+				if (op === "delete") {
+					if (!confirm("Delete this thought?")) return;
+					try {
+						await getJSON(`/@/comments/${encodeURIComponent(id)}/delete`, { method: "POST" });
+						await refresh();
+					} catch (error) {
+						alert(error.message || "Failed to delete");
+					}
+				}
+			});
+
+			setReply("");
+			refresh().catch(error => {
+				statusEl.textContent = "Comment service unavailable";
+				listEl.innerHTML = `<i>${esc(error.message || "Load failed")}</i>`;
+			});
+		}
+	})();
+</script>

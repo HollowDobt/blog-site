@@ -1,0 +1,19 @@
+---
+import config from "$config";
+import Base from "$layouts/Base.astro";
+
+export async function getStaticPaths() {
+	return config.i18n.locales.map(locale => ({ params: { locale: config.i18n.defaultLocale === locale ? undefined : locale } }));
+}
+
+const { locale = config.i18n.defaultLocale } = Astro.params;
+---
+
+<Base {locale} title="Email Unsubscribe">
+	<main class="grow-[0.25] flex items-center justify-center text-center">
+		<div>
+			<p class="text-2xl font-bold">Email unsubscribe is handled by the backend service.</p>
+			<p class="mt-3 opacity-70">This static page does not process unsubscribe tokens directly.</p>
+		</div>
+	</main>
+</Base>
