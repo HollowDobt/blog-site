@@ -3,33 +3,27 @@ import { getCollection } from "astro:content";
 import config, { monolocale } from "$config";
 import graph from "$graph/content";
 import i18nit from "$i18n";
+import { matchesLocaleID, routeLocaleFromID, slugFromID } from "$utils/content-id";
 
 export async function getStaticPaths() {
 	const jottings = await getCollection("jotting", jotting => !jotting.data.draft);
 
-	return jottings.map(jotting => {
-		let locale: string | undefined;
-		let id: string;
+	return jottings
+		.filter(jotting => matchesLocaleID(jotting.id, config.i18n.defaultLocale, config.i18n.defaultLocale, monolocale, config.i18n.locales) || !monolocale)
+		.map(jotting => {
+			const locale = monolocale ? undefined : routeLocaleFromID(jotting.id, config.i18n.locales, config.i18n.defaultLocale);
+			const id = slugFromID(jotting.id, config.i18n.locales);
 
-		if (monolocale) {
-			locale = undefined;
-			id = jotting.id;
-		} else {
-			const [language, ...ids] = jotting.id.split("/");
-			locale = config.i18n.defaultLocale === language ? undefined : language;
-			id = ids.join("/");
-		}
-
-		return {
-			params: { locale, id },
-			props: {
-				type: i18nit(locale || config.i18n.defaultLocale)(`navigation.jotting`),
-				title: jotting.data.title,
-				time: jotting.data.timestamp.toISOString().split("T")[0].replace(/-/g, "/"),
-				tags: jotting.data.tags
-			}
-		};
-	});
+			return {
+				params: { locale, id },
+				props: {
+					type: i18nit(locale || config.i18n.defaultLocale)(`navigation.jotting`),
+					title: jotting.data.title,
+					time: jotting.data.timestamp.toISOString().split("T")[0].replace(/-/g, "/"),
+					tags: jotting.data.tags
+				}
+			};
+		});
 }
 
 /**

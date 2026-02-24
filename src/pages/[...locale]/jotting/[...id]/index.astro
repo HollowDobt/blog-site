@@ -9,33 +9,24 @@ import Icon from "$components/Icon.svelte";
 import Sensitive from "$components/Sensitive.svelte";
 import i18nit from "$i18n";
 import { getRelativeLocaleUrl } from "astro:i18n";
+import { matchesLocaleID, routeLocaleFromID, slugFromID } from "$utils/content-id";
 
 export async function getStaticPaths() {
 	// Get all jottings excluding drafts
 	const jottings = await getCollection("jotting", jotting => !jotting.data.draft);
 
-	return jottings.map(jotting => {
-		let locale: string | undefined;
-		let id: string;
-
-		if (monolocale) {
-			locale = undefined;
-			id = jotting.id;
-		} else {
-			// Extract language and jotting ID from file path structure
-			const [language, ...ids] = jotting.id.split("/");
-
-			locale = config.i18n.defaultLocale === language ? undefined : language;
-			id = ids.join("/");
-		}
-
-		// Generate path params with optional locale (omit for default locale)
-		return { params: { locale, id }, props: { jotting } };
-	});
+	return jottings
+		.filter(jotting => matchesLocaleID(jotting.id, config.i18n.defaultLocale, config.i18n.defaultLocale, monolocale, config.i18n.locales) || !monolocale)
+		.map(jotting => {
+			const id = slugFromID(jotting.id, config.i18n.locales);
+			const locale = monolocale ? undefined : routeLocaleFromID(jotting.id, config.i18n.locales, config.i18n.defaultLocale);
+			return { params: { locale, id }, props: { jotting } };
+		});
 }
 
 const { locale = config.i18n.defaultLocale } = Astro.params;
 const { jotting } = Astro.props;
+const commentItem = Astro.params.id ?? slugFromID(jotting.id, config.i18n.locales);
 const { Content, remarkPluginFrontmatter: frontmatter } = await render(jotting);
 
 const t = i18nit(locale);
@@ -63,7 +54,7 @@ const t = i18nit(locale);
 		<Sensitive {locale} back={getRelativeLocaleUrl(locale, "/jotting")} sensitive={jotting.data.sensitive} client:load>
 			<div class="contents">
 				<section id="markdown-content" class="markdown"><Content /></section>
-				<blockquote id="comment-section"><Comments {locale} link={`${Astro.url.origin}${Astro.url.pathname}`} section="jotting" item={jotting.id} /></blockquote>
+				<blockquote id="comment-section"><Comments {locale} link={`${Astro.url.origin}${Astro.url.pathname}`} section="jotting" item={commentItem} /></blockquote>
 			</div>
 		</Sensitive>
 

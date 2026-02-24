@@ -5,6 +5,7 @@ import config, { monolocale } from "$config";
 import Base from "$layouts/Base.astro";
 import Jotting from "$components/Jotting.svelte";
 import i18nit from "$i18n";
+import { matchesLocaleID, slugFromID } from "$utils/content-id";
 
 export async function getStaticPaths() {
 	// Create path for each locale, omitting default locale from URL
@@ -18,7 +19,7 @@ const t = i18nit(locale);
 const jottings = await getCollection("jotting", jotting => {
 	// Filter by publication status and locale
 	let published = !jotting.data.draft;
-	let localed = monolocale || jotting.id.split("/")[0] === locale;
+	let localed = matchesLocaleID(jotting.id, locale, config.i18n.defaultLocale, monolocale, config.i18n.locales);
 
 	return published && localed;
 });
@@ -26,7 +27,7 @@ const jottings = await getCollection("jotting", jotting => {
 // Standardize note structure
 let list = jottings.map(jotting => ({
 	id: jotting.id,
-	url: getRelativeLocaleUrl(locale, `/jotting/${monolocale ? jotting.id : jotting.id.split("/").slice(1).join("/")}`),
+	url: getRelativeLocaleUrl(locale, `/jotting/${slugFromID(jotting.id, config.i18n.locales)}`),
 	data: {
 		title: jotting.data.title,
 		timestamp: jotting.data.timestamp,

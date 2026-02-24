@@ -46,6 +46,7 @@ type CommentNode = {
 };
 
 const DEFAULT_AVATAR = "/akkarin.webp";
+const LOCALE_PREFIX_RE = /^(en|zh-cn|ja)\//i;
 
 function ok<T>(data: T): ActionSuccess<T> {
 	return { data, error: undefined };
@@ -204,12 +205,17 @@ function normalizeHistory(raw: unknown): CommentHistory[] {
 	});
 }
 
+function normalizeCommentItemKey(item: string): string {
+	const cleaned = item.trim().replace(LOCALE_PREFIX_RE, "");
+	return cleaned || item;
+}
+
 const unsupported = async <T>(): ActionResult<T> => fail("NOT_SUPPORTED");
 
 export const actions = {
 	comment: {
 		list: async ({ section, item }: { section: string; item: string }): ActionResult<{ count: number; treeification: CommentNode[] }> => {
-			const query = new URLSearchParams({ section, item }).toString();
+			const query = new URLSearchParams({ section, item: normalizeCommentItemKey(item) }).toString();
 			const response = await request<Record<string, unknown>>(`/@/comments?${query}`);
 			if (response.error) return response;
 
@@ -243,7 +249,7 @@ export const actions = {
 			push?: number;
 			passer?: { nickname?: string | null; captcha?: string | null };
 		}): ActionResult<void> => {
-			const body: Record<string, unknown> = { section, item, reply, content, link };
+			const body: Record<string, unknown> = { section, item: normalizeCommentItemKey(item), reply, content, link };
 			if (locale) body.locale = locale;
 			if (push != null) body.push = push;
 			if (passer?.nickname) body.nickname = passer.nickname;
@@ -351,4 +357,3 @@ export const actions = {
 		}
 	}
 };
-

@@ -5,6 +5,7 @@ import { getRelativeLocaleUrl } from "astro:i18n";
 import { Feed } from "feed";
 import config, { monolocale } from "$config";
 import i18nit from "$i18n";
+import { matchesLocaleID, slugFromID } from "$utils/content-id";
 
 export async function getStaticPaths() {
 	// Create path for each locale, omitting default locale from URL
@@ -46,7 +47,7 @@ export const GET: APIRoute = async ({ site, params }) => {
 		const notes = await getCollection("note", note => {
 			// Apply filtering criteria
 			const published = !note.data.draft; // Exclude draft posts
-			const localed = monolocale || note.id.split("/")[0] === language; // Language filter
+			const localed = matchesLocaleID(note.id, language, config.i18n.defaultLocale, monolocale, config.i18n.locales); // Language filter
 
 			// Include note only if it passes all filters
 			return published && localed;
@@ -54,7 +55,7 @@ export const GET: APIRoute = async ({ site, params }) => {
 
 		// Attach locale and link for each note
 		notes.forEach(note => {
-			const id = monolocale ? note.id : note.id.split("/").slice(1).join("/");
+			const id = slugFromID(note.id, config.i18n.locales);
 			Reflect.set(note, "link", new URL(getRelativeLocaleUrl(language, `/note/${id}`), site).toString());
 		});
 
@@ -65,7 +66,7 @@ export const GET: APIRoute = async ({ site, params }) => {
 		const jottings = await getCollection("jotting", jotting => {
 			// Apply filtering criteria
 			const published = !jotting.data.draft; // Exclude draft posts
-			const localed = monolocale || jotting.id.split("/")[0] === language; // Language filter
+			const localed = matchesLocaleID(jotting.id, language, config.i18n.defaultLocale, monolocale, config.i18n.locales); // Language filter
 
 			// Include jotting only if it passes all filters
 			return published && localed;
@@ -73,7 +74,7 @@ export const GET: APIRoute = async ({ site, params }) => {
 
 		// Attach locale and link for each jotting
 		jottings.forEach(jotting => {
-			const id = monolocale ? jotting.id : jotting.id.split("/").slice(1).join("/");
+			const id = slugFromID(jotting.id, config.i18n.locales);
 			Reflect.set(jotting, "link", new URL(getRelativeLocaleUrl(language, `/jotting/${id}`), site).toString());
 		});
 

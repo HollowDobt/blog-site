@@ -1,7 +1,11 @@
-@import url("https://cdn.jsdelivr.net/npm/@fontsource/noto-serif/index.css");
-@import url("https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc/index.css");
-@import url("https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-jp/index.css");
-@import url("https://cdn.jsdelivr.net/npm/@fontsource/maple-mono/index.css");
+@import url("https://cdn.jsdelivr.net/npm/@fontsource/noto-serif/400.css");
+@import url("https://cdn.jsdelivr.net/npm/@fontsource/noto-serif/700.css");
+@import url("https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc/400.css");
+@import url("https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc/700.css");
+@import url("https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-jp/400.css");
+@import url("https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-jp/700.css");
+@import url("https://cdn.jsdelivr.net/npm/@fontsource/playwrite-mx/100.css");
+@import url("https://cdn.jsdelivr.net/npm/@fontsource/maple-mono/400.css");
 @import url("https://cdn.jsdelivr.net/npm/@chinese-fonts/maple-mono-cn/dist/MapleMono-CN-Regular/results.css");
 @import url("https://cdn.jsdelivr.net/npm/@chinese-fonts/sft/dist/%E9%9A%8F%E5%B3%B0%E4%BD%93/results.css");
 @import "tailwindcss";

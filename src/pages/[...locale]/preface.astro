@@ -5,6 +5,7 @@ import Time from "$utils/time";
 import Base from "$layouts/Base.astro";
 import Comments from "$components/comment/Section.astro";
 import i18nit from "$i18n";
+import { matchesLocaleID, slugFromID } from "$utils/content-id";
 
 export async function getStaticPaths() {
 	// Create path for each locale, omitting default locale from URL
@@ -17,18 +18,12 @@ const t = i18nit(locale);
 
 const prefaces = (
 	await getCollection("preface", preface => {
-		// Handle single locale setup
-		if (monolocale) return true;
-
-		// Extract language and ID from file path structure
-		const [language] = preface.id.split("/");
-
-		return language === locale;
+		return matchesLocaleID(preface.id, locale, config.i18n.defaultLocale, monolocale, config.i18n.locales);
 	})
 ).sort((a, b) => b.data.timestamp.getTime() - a.data.timestamp.getTime());
 
 // Render each entry
-const entries = await Promise.all(prefaces.map(async preface => ({ ...preface, content: (await render(preface)).Content })));
+const entries = await Promise.all(prefaces.map(async preface => ({ ...preface, routeID: slugFromID(preface.id, config.i18n.locales), content: (await render(preface)).Content })));
 ---
 
 <Base title={t("navigation.preface")} {locale}>
@@ -38,7 +33,7 @@ const entries = await Promise.all(prefaces.map(async preface => ({ ...preface, c
 			{
 				entries.map(preface => [
 					<hr class="my-5 border-b border-primary" />,
-					<li id={preface.id}>
+					<li id={preface.routeID}>
 						<time datetime={preface.data.timestamp.toISOString()} class="block mb-5 font-bold text-xl">
 							{Time.toLocaleString(preface.data.timestamp, locale)}
 						</time>
@@ -46,7 +41,7 @@ const entries = await Promise.all(prefaces.map(async preface => ({ ...preface, c
 							<preface.content />
 						</article>
 						<blockquote class="mb-4">
-							<Comments compact={true} {locale} link={`${Astro.url.origin}${Astro.url.pathname}#${preface.id}`} section="preface" item={preface.id} />
+							<Comments compact={true} {locale} link={`${Astro.url.origin}${Astro.url.pathname}#${preface.routeID}`} section="preface" item={preface.routeID} />
 						</blockquote>
 					</li>
 				])

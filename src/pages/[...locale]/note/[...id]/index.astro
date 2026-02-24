@@ -10,33 +10,24 @@ import Position from "$components/Position.astro";
 import Icon from "$components/Icon.svelte";
 import Sensitive from "$components/Sensitive.svelte";
 import i18nit from "$i18n";
+import { matchesLocaleID, routeLocaleFromID, slugFromID } from "$utils/content-id";
 
 export async function getStaticPaths() {
 	// Get all notes excluding drafts
 	const notes = await getCollection("note", note => !note.data.draft);
 
-	return notes.map(note => {
-		let locale: string | undefined;
-		let id: string;
-
-		if (monolocale) {
-			locale = undefined;
-			id = note.id;
-		} else {
-			// Extract language and note ID from file path structure
-			const [language, ...ids] = note.id.split("/");
-
-			locale = config.i18n.defaultLocale === language ? undefined : language;
-			id = ids.join("/");
-		}
-
-		// Generate path params with optional locale (omit for default locale)
-		return { params: { locale, id }, props: { note } };
-	});
+	return notes
+		.filter(note => matchesLocaleID(note.id, config.i18n.defaultLocale, config.i18n.defaultLocale, monolocale, config.i18n.locales) || !monolocale)
+		.map(note => {
+			const id = slugFromID(note.id, config.i18n.locales);
+			const locale = monolocale ? undefined : routeLocaleFromID(note.id, config.i18n.locales, config.i18n.defaultLocale);
+			return { params: { locale, id }, props: { note } };
+		});
 }
 
 const { locale = config.i18n.defaultLocale } = Astro.params;
 const { note } = Astro.props;
+const commentItem = Astro.params.id ?? slugFromID(note.id, config.i18n.locales);
 
 // Render markdown content and extract headings for TOC
 const { Content, headings, remarkPluginFrontmatter: frontmatter } = await render(note);
@@ -77,7 +68,7 @@ const t = i18nit(locale);
 					<section id="markdown-content" class="markdown"><Content /></section>
 					{note.data.toc && <TOC {headings} {locale} />}
 				</div>
-				<blockquote id="comment-section"><Comments {locale} link={`${Astro.url.origin}${Astro.url.pathname}`} section="note" item={note.id} /></blockquote>
+				<blockquote id="comment-section"><Comments {locale} link={`${Astro.url.origin}${Astro.url.pathname}`} section="note" item={commentItem} /></blockquote>
 			</div>
 		</Sensitive>
 
