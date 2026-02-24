@@ -158,6 +158,29 @@ oauth:
     comment: Edit and delete your own thoughts
     homepage: Display your personal homepage
     notification: Receive email notifications for thought replies
+  email:
+    title: Email sign in
+    address:
+      placeholder: Enter email address
+    name:
+      placeholder: Enter display name (optional)
+    password:
+      empty: Password cannot be empty
+      placeholder: Enter password
+    input:
+      invalid: Invalid email or password format
+    common:
+      failure: Email sign in failed
+    register:
+      name: Register and sign in
+      switch: No account? Register
+      success: Registration successful
+      conflict: This email is already registered
+    login:
+      name: Sign in
+      switch: Already registered? Sign in
+      success: Sign in successful
+      failure: Incorrect email or password
   signin: Sign in with {provider}
 push:
   denied: You have denied desktop notification permission

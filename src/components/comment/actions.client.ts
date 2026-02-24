@@ -363,6 +363,21 @@ export const actions = {
 		}
 	},
 
+	auth: {
+		emailRegister: async ({ email, password, name }: { email: string; password: string; name?: string | null }): ActionResult<void> => {
+			return request<void>("/@/reach/email/register", {
+				method: "POST",
+				body: JSON.stringify({ email, password, name })
+			});
+		},
+		emailLogin: async ({ email, password }: { email: string; password: string }): ActionResult<void> => {
+			return request<void>("/@/reach/email/login", {
+				method: "POST",
+				body: JSON.stringify({ email, password })
+			});
+		}
+	},
+
 	push: {
 		subscribe: async ({ endpoint, p256dh, auth }: { endpoint: string; p256dh: string; auth: string }): ActionResult<number | undefined> => {
 			return request<number | undefined>("/@/push/subscribe", {

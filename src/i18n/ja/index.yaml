@@ -152,6 +152,29 @@ oauth:
     comment: 自分の感想を編集・削除できます
     homepage: 自分の公式本頁を表示できます
     notification: 感想返信の電書通知を受信できます
+  email:
+    title: 電子書簡でログイン
+    address:
+      placeholder: 電子書簡を入力
+    name:
+      placeholder: 表示名を入力（任意）
+    password:
+      empty: 密碼は必須です
+      placeholder: 密碼を入力
+    input:
+      invalid: 電子書簡または密碼の形式が正しくありません
+    common:
+      failure: 電子書簡ログインに失敗しました
+    register:
+      name: 登録してログイン
+      switch: アカウントがない？登録
+      success: 登録に成功しました
+      conflict: この電子書簡は既に登録されています
+    login:
+      name: ログイン
+      switch: 既に登録済み？ログイン
+      success: ログイン成功
+      failure: 電子書簡または密碼が違います
   signin: '{provider} でログイン'
 push:
   denied: 机上通知の許可を拒否しました

@@ -47,6 +47,11 @@ let nickname: string | null = $state(null); // Nickname for unauthenticated user
 let captcha: string | undefined = $state(); // Captcha token for unauthenticated users
 let resetTurnstile: (() => void) | undefined = $state(); // Function to reset Turnstile widget
 let overlength: boolean = $derived(content.length > Number(config.comment?.["max-length"])); // Content length check
+let emailAuthMode: "login" | "register" = $state("login");
+let emailAuthName: string = $state("");
+let emailAuthAddress: string = $state("");
+let emailAuthPassword: string = $state("");
+let emailAuthPending: boolean = $state(false);
 
 // Generate storage key
 const DRAFT_PREFIX = "comment-draft:";
@@ -202,6 +207,51 @@ async function submit() {
 	}
 }
 
+async function submitEmailAuth() {
+	if (emailAuthPending) return;
+
+	const email = emailAuthAddress.trim();
+	const password = emailAuthPassword;
+	if (!email) return pushTip("warning", t("email.empty"));
+	if (!password.trim()) return pushTip("warning", t("oauth.email.password.empty"));
+
+	emailAuthPending = true;
+	const result =
+		emailAuthMode === "register"
+			? await actions.auth.emailRegister({
+					email,
+					password,
+					name: emailAuthName.trim() || undefined
+			  })
+			: await actions.auth.emailLogin({ email, password });
+	emailAuthPending = false;
+
+	if (!result.error) {
+		pushTip("success", t(emailAuthMode === "register" ? "oauth.email.register.success" : "oauth.email.login.success"));
+		reachView = false;
+		location.reload();
+		return;
+	}
+
+	switch (result.error.code) {
+		case "CONFLICT":
+			pushTip("warning", t("oauth.email.register.conflict"));
+			break;
+
+		case "UNAUTHORIZED":
+			pushTip("error", t("oauth.email.login.failure"));
+			break;
+
+		case "BAD_REQUEST":
+			pushTip("warning", t("oauth.email.input.invalid"));
+			break;
+
+		default:
+			pushTip("error", t("oauth.email.common.failure"));
+			break;
+	}
+}
+
 /**
  * Toggle push subscription on/off
  */
@@ -296,6 +346,33 @@ onMount(() => {
 					<span class="font-bold text-sm">{t("oauth.signin", { provider: provider.name })}</span>
 				</a>
 			{/each}
+		</div>
+
+		<hr class="border-0 border-b border-dashed w-full" />
+
+		<div class="flex flex-col items-center gap-2 w-full">
+			<p class="font-bold text-sm">{t("oauth.email.title")}</p>
+			{#if emailAuthMode === "register"}
+				<input type="text" class="input w-full" placeholder={t("oauth.email.name.placeholder")} bind:value={emailAuthName} />
+			{/if}
+			<input type="email" class="input w-full" placeholder={t("oauth.email.address.placeholder")} bind:value={emailAuthAddress} />
+			<input type="password" class="input w-full" placeholder={t("oauth.email.password.placeholder")} bind:value={emailAuthPassword} />
+			<div class="flex items-center justify-between w-full">
+				<button class="form-button" disabled={emailAuthPending} onclick={submitEmailAuth}>
+					{#if emailAuthMode === "register"}
+						{t("oauth.email.register.name")}
+					{:else}
+						{t("oauth.email.login.name")}
+					{/if}
+				</button>
+				<button class="text-sm underline-offset-2 hover:underline" onclick={() => (emailAuthMode = emailAuthMode === "register" ? "login" : "register")}>
+					{#if emailAuthMode === "register"}
+						{t("oauth.email.login.switch")}
+					{:else}
+						{t("oauth.email.register.switch")}
+					{/if}
+				</button>
+			</div>
 		</div>
 
 		<button class="form-button" onclick={() => (reachView = false)}>{t("cancel")}</button>
