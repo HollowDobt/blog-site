@@ -132,9 +132,9 @@ async function deactivate() {
 			<label class="flex items-center gap-1 flex-wrap">{t("drifter.homepage")}: <input type="url" class="input" bind:value={drifter.homepage} /></label>
 			{#if context.email}
 				<Email />
-				{#if drifter.emailState === "verified"}
-					<label class="flex items-center gap-1 flex-wrap">{t("email.notify")}: <input type="checkbox" class="switch" bind:checked={drifter.notify} /></label>
-				{/if}
+			{/if}
+			{#if drifter.emailState === "verified"}
+				<label class="flex items-center gap-1 flex-wrap">{t("email.notify")}: <input type="checkbox" class="switch" bind:checked={drifter.notify} /></label>
 			{/if}
 		</div>
 		<div class="self-center flex gap-5">
