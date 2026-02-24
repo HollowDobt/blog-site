@@ -15,6 +15,7 @@ const title = config.title;
 <script>
 	import MediumnZoom, { type Zoom } from "medium-zoom/dist/pure";
 	import Time from "$utils/time";
+	import { installRenderDebug } from "$utils/render-debug";
 
 	// Set the `title` attribute of all `<time>` elements to localized date-time strings
 	const localizeTimes = () => document.querySelectorAll("time").forEach(time => time.dateTime && (time.title = Time.toLocaleString(time.dateTime, navigator.language, true)));
@@ -34,6 +35,7 @@ const title = config.title;
 
 	// Execute initialization on first load
 	initialize();
+	installRenderDebug();
 
 	// Listen for page load event and re-initialize on page transitions
 	document.addEventListener("astro:page-load", initialize);
