@@ -66,7 +66,10 @@ async function deactivate() {
 
 		pushTip("success", t("drifter.deactivate.success"));
 		// Force top-level logout redirect to clear any residual cookie state.
-		setTimeout(() => (location.href = "/@/depart?next=/"), 600);
+		setTimeout(
+			() => (location.href = `/@/depart?next=${encodeURIComponent(`${location.pathname}${location.search}${location.hash}`)}`),
+			600
+		);
 	} else {
 		pushTip("error", t("drifter.deactivate.failure"));
 	}
