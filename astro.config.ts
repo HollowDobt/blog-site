@@ -97,14 +97,9 @@ export default defineConfig({
 		sitemap(),
 		swup({
 			globalInstance: true,
-			cache: false,
 			preload: false,
 			smoothScrolling: false,
-			progress: true,
-			updateHead: {
-				awaitAssets: true,
-				persistAssets: true
-			}
+			progress: true
 		})
 	]
 });
