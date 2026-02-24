@@ -4,7 +4,7 @@ const env = import.meta.env ?? {};
 
 const config = siteConfig({
 	title: "Hollow Dobt",
-	prologue: "棋盘落子前，先让心跳归零。\n这里是帆楼的角落：\n把世界拆成规则，再把规则写成故事。",
+	prologue: "Before the first move, I slow my pulse.\nThis is Hollow's corner.\nRules are dismantled here, then rewritten as stories.",
 	author: {
 		name: "Hollow Dobt",
 		email: "i@hollowdobt.com",

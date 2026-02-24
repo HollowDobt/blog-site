@@ -1,26 +1,30 @@
 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 160 160" aria-label="Hollow Dobt monochrome logo">
-  <circle cx="80" cy="80" r="74" fill="#fff"/>
-  <circle cx="80" cy="80" r="74" stroke="currentColor" stroke-width="4"/>
+  <defs>
+    <clipPath id="hollow-badge-clip">
+      <circle cx="80" cy="80" r="74" />
+    </clipPath>
+  </defs>
 
-  <path d="M34 115c7-23 24-39 46-45" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
-  <path d="M55 56c8-15 29-23 47-17 18 7 29 26 24 44-6 22-32 34-54 27" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
-  <path d="M61 66c9-8 20-12 31-9 9 3 15 11 16 20" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="80" cy="80" r="74" fill="currentColor" />
 
-  <path d="M74 84c5-2 10-2 14 1" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-  <circle cx="90" cy="79" r="2.8" fill="currentColor"/>
-  <path d="M84 95c5 2 10 2 15-1" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-
-  <path d="M73 40l8-7 11 6-2 10" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M50 101l11 13 17-8" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-
-  <g transform="translate(108 98)">
-    <rect x="0" y="0" width="32" height="42" rx="3" fill="#fff" stroke="currentColor" stroke-width="3"/>
-    <path d="M16 9c-4 4-5 8-5 10 0 4 2 6 5 10 3-4 5-6 5-10 0-2-1-6-5-10Z" fill="currentColor"/>
-    <path d="M16 30v5" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+  <g clip-path="url(#hollow-badge-clip)">
+    <path fill="#fff" d="M17 132c7-17 16-32 29-44s28-19 45-21c8-1 15 0 22 3-20 5-34 19-42 42l-7 20H17Z" />
+    <path fill="#fff" d="M39 97c-7-18-5-40 7-56 10-13 26-21 42-20 12 1 24 7 32 16-13-3-27 0-38 8-12 8-20 20-23 34-2 10-1 20 4 30-9 1-18-2-24-12Z" />
+    <path fill="#fff" d="M61 65c8-9 20-14 32-13 9 1 17 6 22 13-11-1-21 2-29 9-5 4-9 9-11 15-4-3-7-7-9-12-2-4-3-8-2-12h-3Z" />
+    <path fill="#fff" d="M88 40l9-9 15 3 2 10-9 6-12-4-5-6Z" />
+    <path fill="#fff" d="M48 110l12 12 14-8-8-11-18 7Z" />
   </g>
 
-  <g transform="translate(23 24)">
-    <path d="M8 24h20l-4-8 5-5-6-4-5 4-5-4-6 4 5 5-4 8Z" fill="#fff" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
-    <path d="M16 14v10" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M75 78c6-3 12-2 17 1" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+  <circle cx="92" cy="76" r="2.8" fill="currentColor" />
+  <path d="M82 93c6 2 12 1 17-2" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+
+  <g transform="translate(96 42)">
+    <path fill="#fff" d="M20 8c17 0 31 14 31 31s-14 31-31 31c-6 0-11-2-16-4 7-7 10-15 11-25 1-11 5-22 10-33h-5Z" />
+    <path d="M25 22l6-10 6 10Z" fill="currentColor" />
+    <path d="M39 38a5 5 0 1 1 0 10 5 5 0 0 1 0-10Z" fill="currentColor" />
+    <path d="M17 50c7 5 16 6 24 3" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+    <path d="M16 42c4-2 8-2 11 0" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
+    <path d="M28 56l3-3 3 3 3-3 3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
   </g>
 </svg>
