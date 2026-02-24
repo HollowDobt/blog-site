@@ -41,6 +41,7 @@
 	--block-color: #eeeeee;
 	--shadow-color: #cdcdcc;
 	--selection-color: #adadacc3;
+	--tw-border-style: solid;
 
 	--swup-fade-theme-duration: 0.15s;
 
@@ -59,6 +60,7 @@
 	--block-color: #1e1e1e;
 	--shadow-color: #323231;
 	--selection-color: #adadacc3;
+	--tw-border-style: solid;
 
 	.astro-code,
 	.astro-code span {
@@ -202,7 +204,9 @@
 	}
 
 	hr {
-		border: none;
+		/* Keep zero-width reset, but preserve solid style so utility border widths always render. */
+		border-width: 0;
+		border-style: solid;
 	}
 }
 
@@ -355,7 +359,8 @@ input[type="checkbox"].switch {
 	}
 
 	.input {
-		@apply border-b-2 border-b-primary py-0.5 bg-transparent;
+		/* Force explicit style to avoid occasional var(--tw-border-style) fallback misses on some engines. */
+		@apply border-b-2 border-b-primary border-solid py-0.5 bg-transparent;
 	}
 
 	.form-button {

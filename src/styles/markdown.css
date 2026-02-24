@@ -258,7 +258,8 @@
 				border-bottom: 2px solid var(--primary-color);
 			}
 
-			thead tr:last-child {
+			/* Apply separator directly to header cells for more stable rendering across engines. */
+			thead tr:last-child th {
 				border-bottom: 2px solid var(--primary-color);
 			}
 		}
