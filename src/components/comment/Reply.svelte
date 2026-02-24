@@ -408,11 +408,11 @@ onMount(() => {
 		<div class="flex flex-col items-center gap-2 w-full">
 			<p class="font-bold text-sm">{t("oauth.email.title")}</p>
 			<input type="email" class="input w-full" placeholder={t("oauth.email.address.placeholder")} bind:value={emailAuthAddress} />
-			<input type="password" class="input w-full font-mono" style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;" placeholder={t("oauth.email.password.placeholder")} bind:value={emailAuthPassword} />
+			<input type="password" class="input w-full" placeholder={t("oauth.email.password.placeholder")} bind:value={emailAuthPassword} />
 
 			{#if emailAuthMode === "register"}
 				<input type="text" class="input w-full" placeholder={t("oauth.email.name.placeholder")} bind:value={emailAuthName} />
-				<input type="password" class="input w-full font-mono" style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;" placeholder={t("oauth.email.password.confirm")} bind:value={emailAuthPasswordConfirm} />
+				<input type="password" class="input w-full" placeholder={t("oauth.email.password.confirm")} bind:value={emailAuthPasswordConfirm} />
 				<label class="w-full text-sm">{t("oauth.email.human.question", { question: humanQuestion || "..." })}</label>
 				<div class="flex w-full gap-2">
 					<input type="text" class="input grow" placeholder={t("oauth.email.human.placeholder")} bind:value={humanAnswer} />
