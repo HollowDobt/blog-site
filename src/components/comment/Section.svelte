@@ -1,5 +1,5 @@
 <script lang="ts">
-import { actions } from "astro:actions";
+import { actions } from "./actions.client";
 import { onMount } from "svelte";
 import { flip } from "svelte/animate";
 import Icon from "$components/Icon.svelte";
@@ -95,18 +95,20 @@ onMount(async () => {
 	}
 
 	// Initial load of push subscription status
-	// Register service worker for push notifications
-	const registration = await navigator.serviceWorker.register("/sw.js");
-	const subscription = await registration.pushManager.getSubscription();
+	if (context.push && "serviceWorker" in navigator) {
+		// Register service worker for push notifications
+		const registration = await navigator.serviceWorker.register("/sw.js");
+		const subscription = await registration.pushManager.getSubscription();
 
-	if (subscription) {
-		// Verify subscription is still valid on server
-		const { data } = await actions.push.check(subscription.endpoint);
-		if (data) {
-			context.subscription = data;
-		} else {
-			// Clean up invalid subscription
-			await subscription.unsubscribe();
+		if (subscription) {
+			// Verify subscription is still valid on server
+			const { data, error } = await actions.push.check(subscription.endpoint);
+			if (!error && data) {
+				context.subscription = data;
+			} else {
+				// Clean up invalid subscription
+				await subscription.unsubscribe();
+			}
 		}
 	}
 

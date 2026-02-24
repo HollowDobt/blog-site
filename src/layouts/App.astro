@@ -3,6 +3,7 @@ import { getRelativeLocaleUrl } from "astro:i18n";
 import { turnstile } from "$config";
 
 const { locale, title, subtitle, description, author, article } = Astro.props;
+
 ---
 
 <html lang={locale} dir={["ar", "he", "fa", "ur"].includes(locale) ? "rtl" : "ltr"}>
@@ -22,7 +23,7 @@ const { locale, title, subtitle, description, author, article } = Astro.props;
 		<meta property="og:site_name" content={title} />
 		<meta property="og:locale" content={locale.replace(/-(\w+)/, (_: any, region: string) => `_${region.toUpperCase()}`)} />
 
-		<meta property="og:image" content={new URL("linkback.webp", Astro.site)} />
+		<meta property="og:image" content={article ? new URL(`${Astro.url.pathname}/graph.png`, Astro.site) : new URL("graph.png", Astro.site)} />
 		<meta property="og:image:alt" content={title} />
 		<meta property="og:image:width" content="1200" />
 		<meta property="og:image:height" content="630" />

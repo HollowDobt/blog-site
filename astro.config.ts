@@ -33,7 +33,6 @@ import copy from "@tuyuritio/shiki-code-copy";
 import reading from "./src/utils/reading";
 
 import siteConfig from "./site.config";
-
 // https://astro.build/config
 export default defineConfig({
 	output: "static",

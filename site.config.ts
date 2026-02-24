@@ -3,21 +3,21 @@ import siteConfig, { providers } from "./src/utils/config";
 const env = import.meta.env ?? {};
 
 const config = siteConfig({
-	title: "Hollow Dobt Blog",
-	prologue: "Notes, thoughts, and experiments.",
+	title: "Hollow Dobt",
+	prologue: "",
 	author: {
 		name: "Hollow Dobt",
 		email: "i@hollowdobt.com",
 		link: "https://blog.hollowdobt.com"
 	},
-	description: "Personal blog powered by Astro and Thought Lite.",
+	description: "Hollow Dobt blog",
 	copyright: {
 		type: "CC BY-NC-ND 4.0",
 		year: "2026"
 	},
 	i18n: {
-		locales: ["en", "zh-cn", "ja"],
-		defaultLocale: "en"
+		locales: ["zh-cn"],
+		defaultLocale: "zh-cn"
 	},
 	pagination: {
 		note: 15,

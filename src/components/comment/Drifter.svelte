@@ -1,5 +1,5 @@
 <script lang="ts">
-import { actions } from "astro:actions";
+import { actions } from "./actions.client";
 import Icon from "$components/Icon.svelte";
 import Modal from "$components/Modal.svelte";
 import { pushTip } from "$components/Tip.svelte";
@@ -48,6 +48,11 @@ async function update() {
 
 // Control deactivation confirmation modal
 let deactivateView = $state(false);
+
+async function signout() {
+	const { error } = await actions.drifter.depart();
+	if (!error) location.reload();
+}
 
 /**
  * Permanently deactivate user account and clean up data
@@ -105,7 +110,7 @@ async function deactivate() {
 					{/each}
 					{drifter.name}
 					<button onclick={synchronize}><Icon name="lucide--refresh-cw" title={t("drifter.sync.name")} /></button>
-					<button onclick={() => (location.href = "/@/depart")}><Icon name="lucide--log-out" title={t("drifter.signout")} /></button>
+					<button onclick={signout}><Icon name="lucide--log-out" title={t("drifter.signout")} /></button>
 					<button onclick={() => (deactivateView = true)} class="ms-auto text-red-500"><Icon name="lucide--user-round-x" title={t("drifter.deactivate.name")} /></button>
 				</menu>
 				{#if drifter.description}<span class="text-sm">{drifter.description}</span>{/if}

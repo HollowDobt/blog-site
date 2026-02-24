@@ -1,5 +1,5 @@
 <script lang="ts">
-import { actions } from "astro:actions";
+import { actions } from "./actions.client";
 import config from "$config";
 import remark from "$utils/remark";
 import Time from "$utils/time";

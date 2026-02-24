@@ -1,3 +1,9 @@
+@import url("https://cdn.jsdelivr.net/npm/@fontsource/noto-serif/index.css");
+@import url("https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc/index.css");
+@import url("https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-jp/index.css");
+@import url("https://cdn.jsdelivr.net/npm/@fontsource/maple-mono/index.css");
+@import url("https://cdn.jsdelivr.net/npm/@chinese-fonts/maple-mono-cn/dist/MapleMono-CN-Regular/results.css");
+@import url("https://cdn.jsdelivr.net/npm/@chinese-fonts/sft/dist/%E9%9A%8F%E5%B3%B0%E4%BD%93/results.css");
 @import "tailwindcss";
 
 @plugin "@iconify/tailwind4" {
@@ -19,9 +25,9 @@
 	--font-noto-serif: "Noto Serif", Georgia, "Times New Roman", serif;
 	--font-noto-serif-sc: "Noto Serif SC", "Source Han Serif SC", STSong, "Songti SC", SimSun, serif;
 	--font-noto-serif-jp: "Noto Serif JP", "Source Han Serif JP", "Hiragino Mincho ProN", "MS Mincho", serif;
-	--font-playwrite-mx: "Apple Chancery", "Segoe Script", cursive;
-	--font-the-peak-font-plus: Georgia, STSong, serif;
+	--font-playwrite-mx: "Playwrite MX", "Apple Chancery", "Segoe Script", cursive;
 	--font-maple-mono-nf-cn: "Maple Mono NF CN", "Maple Mono NF", "Maple Mono CN", "Maple Mono", Consolas, Monaco, "Cascadia Code", "Courier New", monospace;
+	--font-the-peak-font-plus: "The Peak Font Plus", "The Peak Font 隨峰體", "The Peak Font 随峰体", Georgia, STSong, serif;
 
 	--primary-color: #2a2a28;
 	--secondary-color: #50504d;

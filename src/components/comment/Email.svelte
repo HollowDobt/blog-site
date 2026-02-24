@@ -3,7 +3,7 @@ import Modal from "$components/Modal.svelte";
 import Icon from "$components/Icon.svelte";
 import { pushTip } from "$components/Tip.svelte";
 import i18nit from "$i18n";
-import { actions } from "astro:actions";
+import { actions } from "./actions.client";
 import context, { countdownEmail } from "./context.svelte";
 
 const t = i18nit(context.locale);

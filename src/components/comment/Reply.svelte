@@ -1,5 +1,5 @@
 <script lang="ts">
-import { ActionError, actions } from "astro:actions";
+import { actions, type ActionErrorLike } from "./actions.client";
 import { onMount, untrack } from "svelte";
 import { slide } from "svelte/transition";
 import { Turnstile } from "svelte-turnstile";
@@ -128,7 +128,7 @@ async function submit() {
 	// Validate content is not empty
 	if (!content.trim()) return pushTip("warning", t("comment.empty"));
 
-	let error: ActionError | undefined;
+	let error: ActionErrorLike | undefined;
 	if (!context.drifter) {
 		// For unauthenticated users, validate captcha and nickname
 		if (!captcha) return pushTip("error", t("comment.verify.failure"));
@@ -291,7 +291,7 @@ onMount(() => {
 
 		<div class="flex flex-col items-center gap-2">
 			{#each context.oauth as provider}
-				<a href={`/@/reach/${provider.name}`} class="flex items-center justify-center gap-2 w-full border-2 border-secondary py-1 px-2 rounded">
+				<a href={`/@/reach/${provider.name.toLowerCase()}`} class="flex items-center justify-center gap-2 w-full border-2 border-secondary py-1 px-2 rounded">
 					<Icon size="0.95rem" name={provider.logo} />
 					<span class="font-bold text-sm">{t("oauth.signin", { provider: provider.name })}</span>
 				</a>
