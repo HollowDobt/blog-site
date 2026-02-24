@@ -12,7 +12,7 @@ function Time(time?: string | Date, userTimezone: boolean = false) {
 	if (time instanceof Date) time = time.toISOString();
 
 	const instant = time ? Temporal.Instant.from(time) : Temporal.Now.instant();
-	const timezone = userTimezone ? Temporal.Now.timeZoneId() : import.meta.env.PUBLIC_TIMEZONE || "UTC";
+	const timezone = userTimezone ? Temporal.Now.timeZoneId() : import.meta.env.PUBLIC_TIMEZONE || "Asia/Shanghai";
 
 	return instant.toZonedDateTimeISO(timezone);
 }
