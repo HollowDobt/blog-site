@@ -30,8 +30,8 @@
 	"scripts": {
 		"new": "tsx --loader esm-loader-yaml scripts/new.ts",
 		"inject:timestamps": "node scripts/inject-git-timestamps.mjs",
-		"predev": "pnpm run inject:timestamps",
-		"prebuild": "pnpm run inject:timestamps",
+		"predev": "node scripts/inject-git-timestamps.mjs",
+		"prebuild": "node scripts/inject-git-timestamps.mjs",
 		"dev": "astro dev",
 		"check": "astro check",
 		"build": "astro build",
