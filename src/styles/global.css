@@ -1,14 +1,49 @@
-@import url("https://cdn.jsdelivr.net/npm/@fontsource/noto-serif/400.css");
-@import url("https://cdn.jsdelivr.net/npm/@fontsource/noto-serif/700.css");
-@import url("https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc/400.css");
-@import url("https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc/700.css");
-@import url("https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-jp/400.css");
-@import url("https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-jp/700.css");
+@import url("https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-web/style.css");
 @import url("https://cdn.jsdelivr.net/npm/@fontsource/playwrite-mx/100.css");
-@import url("https://cdn.jsdelivr.net/npm/@fontsource/maple-mono/400.css");
-@import url("https://cdn.jsdelivr.net/npm/@chinese-fonts/maple-mono-cn/dist/MapleMono-CN-Regular/results.css");
 @import url("https://cdn.jsdelivr.net/npm/@chinese-fonts/sft/dist/%E9%9A%8F%E5%B3%B0%E4%BD%93/results.css");
 @import "tailwindcss";
+
+/* spectral-latin-400-normal */
+@font-face {
+	font-family: "Spectral";
+	font-style: normal;
+	font-display: swap;
+	font-weight: 400;
+	src:
+		url("https://cdn.jsdelivr.net/fontsource/fonts/spectral@latest/latin-400-normal.woff2") format("woff2"),
+		url("https://cdn.jsdelivr.net/fontsource/fonts/spectral@latest/latin-400-normal.woff") format("woff");
+	unicode-range:
+		U+0000-00FF,
+		U+0131,
+		U+0152-0153,
+		U+02BB-02BC,
+		U+02C6,
+		U+02DA,
+		U+02DC,
+		U+0304,
+		U+0308,
+		U+0329,
+		U+2000-206F,
+		U+20AC,
+		U+2122,
+		U+2191,
+		U+2193,
+		U+2212,
+		U+2215,
+		U+FEFF,
+		U+FFFD;
+}
+
+/* noto-sans-mono-latin-400-normal */
+@font-face {
+	font-family: "Noto Sans Mono";
+	font-style: normal;
+	font-display: swap;
+	font-weight: 400;
+	src:
+		url("https://cdn.jsdelivr.net/fontsource/fonts/noto-sans-mono@latest/latin-400-normal.woff2") format("woff2"),
+		url("https://cdn.jsdelivr.net/fontsource/fonts/noto-sans-mono@latest/latin-400-normal.woff") format("woff");
+}
 
 @plugin "@iconify/tailwind4" {
 	prefixes: lucide, simple-icons, fa6-brands, svg-spinners;
@@ -26,11 +61,11 @@
 
 :root,
 [data-theme="light"] {
-	--font-noto-serif: "Noto Serif", Georgia, "Times New Roman", serif;
-	--font-noto-serif-sc: "Noto Serif SC", "Source Han Serif SC", STSong, "Songti SC", SimSun, serif;
-	--font-noto-serif-jp: "Noto Serif JP", "Source Han Serif JP", "Hiragino Mincho ProN", "MS Mincho", serif;
+	--font-noto-serif: "Spectral", Georgia, "Times New Roman", serif;
+	--font-noto-serif-sc: "LXGW WenKai Screen", "LXGW WenKai", "Kaiti SC", STKaiti, "KaiTi", serif;
+	--font-noto-serif-jp: "LXGW WenKai Screen", "LXGW WenKai", "Kaiti SC", STKaiti, "KaiTi", serif;
 	--font-playwrite-mx: "Playwrite MX", "Apple Chancery", "Segoe Script", cursive;
-	--font-maple-mono-nf-cn: "Maple Mono NF CN", "Maple Mono NF", "Maple Mono CN", "Maple Mono", Consolas, Monaco, "Cascadia Code", "Courier New", monospace;
+	--font-maple-mono-nf-cn: "Noto Sans Mono", "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 	--font-the-peak-font-plus: "The Peak Font Plus", "The Peak Font 隨峰體", "The Peak Font 随峰体", Georgia, STSong, serif;
 
 	--primary-color: #2a2a28;
@@ -69,11 +104,11 @@
 
 /* Language-specific fonts */
 :lang(zh-cn) {
-	--font-serif: var(--font-noto-serif-sc);
+	--font-serif: var(--font-noto-serif), var(--font-noto-serif-sc), serif;
 }
 
 :lang(ja) {
-	--font-serif: var(--font-noto-serif-jp);
+	--font-serif: var(--font-noto-serif), var(--font-noto-serif-jp), serif;
 }
 
 @layer base {
@@ -112,7 +147,7 @@
 
 	body {
 		font-size: 1.0625rem;
-		font-family: var(--font-serif), var(--font-mono);
+		font-family: var(--font-serif);
 		color: var(--primary-color);
 		background-color: var(--background-color);
 		overflow-x: clip;
@@ -300,7 +335,7 @@ input[type="checkbox"].switch {
 	--color-shadow: var(--shadow-color);
 	--color-selection: var(--selection-color);
 
-	--font-serif: var(--font-noto-serif);
+	--font-serif: var(--font-noto-serif), var(--font-noto-serif-sc), serif;
 	--font-mono: var(--font-maple-mono-nf-cn);
 	--font-cursive: var(--font-playwrite-mx), var(--font-the-peak-font-plus);
 
