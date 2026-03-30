@@ -106,6 +106,45 @@ pnpm build
 
 这样评论、登录、邮件等请求仍由现有服务器侧后端继续承接，但浏览器访问保持在同一个 `blog.hollowdobt.com` 域名下。
 
+## 🏗️ 当前运行原理
+
+当前线上博客已经是明确的“前端 Netlify + 后端服务器”结构：
+
+1. `blog.hollowdobt.com` 这个子域名的 DNS 由 Netlify 托管，并直接由 Netlify 负责 TLS 证书和静态文件分发。
+2. 当前仓库只负责生成前端静态产物；Netlify 从 GitHub 拉取本仓库，执行 `pnpm build`，再发布 `dist/`。
+3. 浏览器访问页面时，HTML、CSS、JS、图片等静态资源都由 Netlify 返回。
+4. 评论、登录、邮件验证等后端请求仍然保持原来的同源路径 `/@/*`，但这些请求会被 [netlify.toml](/Users/renxiqing/blog/server-blog/netlify.toml) 反向代理到 `https://blog-api.hollowdobt.com/@/*`。
+5. `blog-api.hollowdobt.com` 再由服务器上的 Nginx 转发到本机评论/用户服务，因此后端逻辑仍然完全跑在你自己的服务器上。
+
+换句话说：
+
+- 前端访问速度与全球分发，主要由 Netlify 负责。
+- 评论与用户系统的数据、接口和稳定性，仍然由你自己的服务器负责。
+- 浏览器看到的域名始终是 `blog.hollowdobt.com`，所以前端现有交互不需要改成另一套 API 域名。
+
+## 🔁 当前更新流程
+
+当前仓库的标准前端发布流程已经切成：
+
+```sh
+git add -A
+git commit -m "your message"
+git push
+```
+
+执行后会发生：
+
+1. 代码推到 GitHub 仓库 `HollowDobt/blog-site` 的 `main` 分支。
+2. Netlify 监听到这次 GitHub push，自动触发新的生产构建。
+3. Netlify 执行 `pnpm build`，并把新的 `dist/` 发布到 `blog.hollowdobt.com`。
+4. `/@/*` 仍然继续回源到你服务器上的后端服务，因此前端更新不会重启或替换后端。
+
+注意：
+
+- 这个前端仓库今后默认应该推 GitHub，不应该再把它当作服务器生产发布仓库使用。
+- 如果你只更新前端内容，不需要登录服务器部署任何前端文件。
+- 服务器侧后端仍然独立运行，除非你主动改后端服务，否则它不会因为前端仓库的 push 被覆盖。
+
 ## 🔄 更新
 
 运行以下命令以同步上游前端主题更新：
