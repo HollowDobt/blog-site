@@ -1,6 +1,5 @@
 ---
 import { getRelativeLocaleUrl } from "astro:i18n";
-import { turnstile } from "$config";
 
 const { locale, title, subtitle, description, author, article } = Astro.props;
 
@@ -37,7 +36,6 @@ const { locale, title, subtitle, description, author, article } = Astro.props;
 		<link rel="shortcut icon" href="/favicon.ico" />
 		<link rel="sitemap" href="/sitemap-index.xml" />
 
-		{turnstile && [<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onloadTurnstileCallback" async defer data-swup-ignore-script is:inline />]}
 		<script is:inline>
 			window.MathJax = {
 				tex: {

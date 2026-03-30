@@ -1,3 +1,5 @@
+import type { Swup } from "@swup/astro/client";
+
 type DebugDetails = Record<string, unknown> | unknown[] | string | number | boolean | null;
 
 type DebugEntry = {
@@ -26,11 +28,6 @@ declare global {
 			snapshot: (reason?: string) => void;
 		};
 		__renderDebugInstalled?: boolean;
-		swup?: {
-			hooks?: {
-				on: (event: string, callback: (...args: unknown[]) => void) => void;
-			};
-		} & Record<string, unknown>;
 	}
 }
 
@@ -66,7 +63,8 @@ const probes: Probe[] = [
 	}
 ];
 
-const swupEvents = ["visit:start", "visit:end", "content:replace", "page:view", "page:load", "enable", "disable"];
+type SwupEventName = Parameters<Swup["hooks"]["on"]>[0];
+const swupEvents: SwupEventName[] = ["visit:start", "visit:end", "content:replace", "page:view", "page:load", "enable", "disable"];
 
 let enabled = false;
 let logs: DebugEntry[] = [];
@@ -145,7 +143,7 @@ function readComputedProbe(probe: Probe) {
 }
 
 function readStylesheetState() {
-	const stylesheets = Array.from(document.querySelectorAll('link[rel~="stylesheet"]')).map(link => {
+	const stylesheets = Array.from(document.querySelectorAll<HTMLLinkElement>('link[rel~="stylesheet"]')).map(link => {
 		let ruleCount: number | null = null;
 		let accessError: string | undefined;
 		try {
@@ -162,11 +160,11 @@ function readStylesheetState() {
 		};
 	});
 
-	const styleTags = Array.from(document.querySelectorAll("style")).map((style, index) => ({
+	const styleTags = Array.from(document.querySelectorAll<HTMLStyleElement>("style")).map((style, index) => ({
 		index,
 		length: style.textContent?.length ?? 0,
 		media: style.media || "all",
-		disabled: (style as HTMLStyleElement).disabled ?? false,
+		disabled: style.disabled ?? false,
 		dataAstroCid: style.getAttribute("data-astro-cid")
 	}));
 
@@ -234,8 +232,12 @@ function installHeadObserver() {
 	});
 }
 
-function summarizeSwupPayload(payload: unknown) {
-	if (!payload || typeof payload !== "object") return payload;
+function summarizeSwupPayload(payload: unknown): DebugDetails | undefined {
+	if (payload == null) return undefined;
+	if (typeof payload !== "object") {
+		if (["string", "number", "boolean"].includes(typeof payload)) return payload as string | number | boolean;
+		return String(payload);
+	}
 	const candidate = payload as Record<string, unknown>;
 	const visit = (candidate.visit && typeof candidate.visit === "object" ? candidate.visit : candidate) as Record<string, unknown>;
 
@@ -251,11 +253,11 @@ function summarizeSwupPayload(payload: unknown) {
 }
 
 function attachSwupHooks(source: string) {
-	const swup = window.swup;
+	const swup = window.swup as (Swup & { __renderDebugHooksAttached?: boolean }) | undefined;
 	if (!swup?.hooks?.on) return false;
-	if ((swup as { __renderDebugHooksAttached?: boolean }).__renderDebugHooksAttached) return true;
+	if (swup.__renderDebugHooksAttached) return true;
 
-	(swup as { __renderDebugHooksAttached?: boolean }).__renderDebugHooksAttached = true;
+	swup.__renderDebugHooksAttached = true;
 	addLog("swup:hooks-attached", { source });
 
 	for (const event of swupEvents) {
@@ -356,4 +358,3 @@ export function installRenderDebug() {
 
 	snapshot("install");
 }
-

@@ -14,28 +14,16 @@ let {
 	link,
 	section,
 	item,
-	oauth,
-	turnstile,
-	push,
-	email,
 	compact = false
 }: {
 	locale: string;
 	link: string;
 	section: string;
 	item: string;
-	oauth: any;
-	turnstile?: string;
-	push?: string;
-	email: boolean;
 	compact?: boolean;
 } = $props();
 
 context.locale = locale;
-context.oauth = oauth;
-context.turnstile = turnstile;
-context.push = push;
-context.email = email;
 
 const t = i18nit(locale);
 

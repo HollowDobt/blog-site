@@ -19,8 +19,8 @@
 </div>
 
 > [!NOTE]
-> - `main` 分支：静态化构建，可部署在任何静态托管平台。
-> - `cloudflare` 分支✅：启用内置评论系统，仅支持在 Cloudflare 部署。
+> - 这个仓库现在只保留博客前端静态站点。
+> - 评论、登录、邮件验证、推送等后端服务已独立在服务器侧运行，并通过同源 `/@/*` 接口接入。
 
 🎬 **在线演示**：[Cloudflare Workers](https://thought-lite.ttio.workers.dev/zh-cn/)
 
@@ -32,16 +32,15 @@
 - [x] **i18n 支持** - 可扩展的多语言支持，单语言模式同样适用。
 - [x] **Sitemap 及 Feed 订阅** - 自动化生成 Sitemap 和 Atom Feed。
 - [x] **OpenGraph 支持** - 内置 Open Graph 元标签，优化社交媒体分享效果。
-- [x] **评论系统** - 基于 Cloudflare D1，部署便捷，隐私可控；支持 OAuth 身份认证和免登录评论。
-- [x] **桌面通知** - 使用 Web Push API 推送实时通知。
-- [x] **邮件通知** - 使用 Restful API 发送邮件通知。
+- [x] **评论前端** - 页面端直接通过同源 `/@/*` 接口接入独立后端服务。
+- [x] **静态部署友好** - `pnpm build` 直接产出静态站点，适合 GitHub + Netlify 工作流。
 
 ## 📋 前期准备
 
-在开始之前，请确保拥有以下账户：
+在开始之前，请确保至少有：
 
-- [Cloudflare 账户](https://dash.cloudflare.com/sign-up) - 用于部署和数据库托管
 - [GitHub 账户](https://github.com/signup) - 用于代码托管和自动部署
+- 一个静态托管平台账户（如 Netlify） - 用于部署前端产物 `dist/`
 
 ## ⚡️ 快速上手
 
@@ -50,13 +49,7 @@
 运行如下命令：
 
 ```sh
-# 末尾的 `cloudflare` 是分支名称，请勿省略！
-pnpm create astro --template tuyuritio/astro-theme-thought-lite#cloudflare
-
-# 根据交互提示创建项目
-
-cd <your-project-name>
-pnpm db:migrate:local
+pnpm install
 pnpm dev
 ```
 
@@ -69,20 +62,19 @@ pnpm dev
 git clone <your-repo-url>
 cd <your-repo-name>
 pnpm install
-pnpm db:migrate:local
 pnpm dev
 ```
 
 ## 🔧 配置
 
-1. 创建 Cloudflare D1，参阅[Cloudflare D1 配置指南](src/content/note/zh-cn/cloudflare-d1.md)。
-2. 配置 Cloudflare Turnstile，参阅[Cloudflare Turnstile 配置指南](src/content/note/zh-cn/cloudflare-turnstile.md)。
-    - 如果不启用匿名评论，可跳过这一步。
-3. 配置 OAuth 认证，参阅[OAuth 配置指南](src/content/note/zh-cn/oauth.md)。
-4. 自定义站点配置及国际化（i18n）配置，请修改以下文件，参阅[站点配置指南](src/content/note/zh-cn/configuration.md)及[国际化配置指南](src/content/note/zh-cn/internationalization.md)：
-    - `.env`
+前端仓库主要只维护静态站点本身：
+
+1. 自定义站点配置及国际化（i18n）配置，请修改以下文件：
     - `astro.config.ts`
     - `site.config.ts`
+2. 内容创作与页面结构调整请集中在 `src/content`、`src/pages`、`src/components`。
+3. `/@/*` 后端接口由服务器上的独立服务提供，不在这个仓库里维护。
+4. 前端仓库不再在构建期读取评论系统的后端能力开关，Netlify 侧无需额外同步那套服务端私有配置。
 
 ## 💻 命令
 
@@ -99,31 +91,24 @@ pnpm dev
 | `pnpm preview` | 预览构建后的站点 |
 | `pnpm format` | 代码格式化 |
 | `pnpm lint` | 代码检查 |
-| `pnpm deploy` | 部署到 Cloudflare |
-| `pnpm deploy:dry` | 模拟部署 |
-| `pnpm db:migration` | 生成数据库迁移文件 |
-| `pnpm db:migrate:local` | 在本地应用数据库迁移 |
-| `pnpm db:migrate:remote` | 在远程应用数据库迁移 |
 
 ## 🚀 部署
 
 ```sh
 pnpm build
-pnpm deploy
 ```
 
-使用 GitHub Actions **自动部署**的配置请参阅[GitHub Actions 配置指南](src/content/note/zh-cn/github-actions.md)。
+将生成的 `dist/` 发布到静态托管平台即可。若使用 GitHub + Netlify，则直接让 Netlify 监听当前仓库分支构建 `dist/`。评论、登录、邮件等 `/@/*` 请求仍应由现有服务器侧后端继续承接。
 
 ## 🔄 更新
 
-运行以下命令以同步上游更新：
+运行以下命令以同步上游前端主题更新：
 
 ```sh
 git remote add theme https://github.com/tuyuritio/astro-theme-thought-lite.git
 git fetch theme
-git merge theme/cloudflare  # 首次更新需添加 `--allow-unrelated-histories` 参数
+git merge theme/main  # 首次更新需添加 `--allow-unrelated-histories` 参数
 pnpm install
-pnpm db:migrate:local
 ```
 
 ## ✍️ 创作
@@ -159,11 +144,7 @@ pnpm db:migrate:local
 - **字体** - [Google Fonts](https://fonts.google.com/) | [ZeoSeven Fonts](https://fonts.zeoseven.com/)
 - **图片查看器** - [Medium Zoom](https://github.com/francoischalifour/medium-zoom)
 - **SPA 过渡** - [Swup](https://swup.js.org/)
-- **OAuth 认证** - [Arctic](https://arcticjs.dev/)
 - **代码质量** - [Biome](https://biomejs.dev/)
-- **对象关系映射** - [Drizzle ORM](https://orm.drizzle.team/)
-- **数据库** - [Cloudflare D1](https://developers.cloudflare.com/d1/)
-- **边缘部署** - [Cloudflare Workers](https://workers.cloudflare.com/)
 
 ### 灵感来源
 
