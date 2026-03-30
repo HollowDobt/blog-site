@@ -98,7 +98,13 @@ pnpm dev
 pnpm build
 ```
 
-将生成的 `dist/` 发布到静态托管平台即可。若使用 GitHub + Netlify，则直接让 Netlify 监听当前仓库分支构建 `dist/`。评论、登录、邮件等 `/@/*` 请求仍应由现有服务器侧后端继续承接。
+将生成的 `dist/` 发布到静态托管平台即可。若使用 GitHub + Netlify，则当前仓库已经内置 [netlify.toml](/Users/renxiqing/blog/server-blog/netlify.toml)：
+
+- 前端构建命令固定为 `pnpm build`
+- 发布目录固定为 `dist`
+- `/@/*` 会由 Netlify 反向代理到 `https://blog-api.hollowdobt.com/@/*`
+
+这样评论、登录、邮件等请求仍由现有服务器侧后端继续承接，但浏览器访问保持在同一个 `blog.hollowdobt.com` 域名下。
 
 ## 🔄 更新
 
