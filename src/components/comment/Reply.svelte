@@ -2,9 +2,7 @@
 import { actions, type ActionErrorLike } from "./actions.client";
 import { onMount, untrack } from "svelte";
 import { slide } from "svelte/transition";
-import { Turnstile } from "svelte-turnstile";
-import { solveChallenge } from "altcha-lib";
-import remark from "$utils/remark";
+import { renderMarkdown } from "$utils/markdown.client";
 import Icon from "$components/Icon.svelte";
 import Modal from "$components/Modal.svelte";
 import { pushTip } from "$components/Tip.svelte";
@@ -69,6 +67,8 @@ let registerHumanVerifying: boolean = $state(false);
 let emailAuthVerificationId: string = $state("");
 let emailAuthCode: string = $state("");
 let emailAuthCodeSent: boolean = $state(false);
+let previewHtml: Promise<string> | null = $state(null);
+let TurnstileComponent: any = $state(null);
 
 // Generate storage key
 const DRAFT_PREFIX = "comment-draft:";
@@ -139,6 +139,7 @@ function insertEmoji(emoji: string) {
 
 async function solveHumanPayload(challenge: HumanChallenge): Promise<Record<string, unknown> | null> {
 	const max = Number(challenge.maxnumber ?? 100000);
+	const { solveChallenge } = await import("altcha-lib");
 	const task = solveChallenge(challenge.challenge, challenge.salt, challenge.algorithm, max);
 	const solved = await task.promise;
 	if (!solved) return null;
@@ -161,6 +162,12 @@ async function loadHumanChallenge() {
 		registerHumanChallenge = null;
 		registerHumanPayload = null;
 	}
+}
+
+async function ensureTurnstile() {
+	if (TurnstileComponent || !context.turnstile || context.drifter) return;
+	const { Turnstile } = await import("svelte-turnstile");
+	TurnstileComponent = Turnstile;
 }
 
 async function verifyRegisterHuman() {
@@ -551,7 +558,18 @@ onMount(() => {
 	// If unauthenticated, setup nickname and Turnstile
 	if (!context.drifter) {
 		nickname = localStorage.getItem("nickname");
+		void ensureTurnstile();
 	}
+});
+
+$effect(() => {
+	if (!preview) {
+		previewHtml = null;
+		return;
+	}
+
+	const value = content.trim();
+	previewHtml = value ? renderMarkdown(content) : null;
 });
 </script>
 
@@ -659,7 +677,7 @@ onMount(() => {
 				<textarea hidden={preview} placeholder="   {t('comment.placeholder')}" bind:this={textarea} bind:value={content} class="grow w-full bg-transparent text-base resize-none transition-[height]"></textarea>
 				{#if preview}
 					{#if content.trim()}
-						{#await remark.process(content)}
+						{#await previewHtml}
 							<Icon name="svg-spinners--pulse-3" size={30} />
 						{:then html}
 							<div class="markdown comment">{@html html}</div>
@@ -686,7 +704,11 @@ onMount(() => {
 					<button onclick={() => (profileView = true)}><Icon name="lucide--user-round-pen" title={t("drifter.profile")} /></button>
 				{:else}
 					{#if context.turnstile}
-						<Turnstile siteKey={context.turnstile} bind:reset={resetTurnstile} on:expired={() => (captcha = undefined)} on:error={() => (captcha = undefined)} on:callback={({ detail }) => (captcha = detail.token)} />
+						{#if TurnstileComponent}
+							<TurnstileComponent siteKey={context.turnstile} bind:reset={resetTurnstile} on:expired={() => (captcha = undefined)} on:error={() => (captcha = undefined)} on:callback={({ detail }) => (captcha = detail.token)} />
+						{:else}
+							<span class="contents text-primary"><Icon name="svg-spinners--pulse-rings-3" title={t("comment.verify.progress")} /></span>
+						{/if}
 					{/if}
 					<input type="text" placeholder={t("comment.nickname.name")} bind:value={nickname} class="input border-weak w-35 text-sm" />
 					{#if hasSigninOption}

@@ -11,6 +11,7 @@ import Icon from "$components/Icon.svelte";
 import Sensitive from "$components/Sensitive.svelte";
 import i18nit from "$i18n";
 import { matchesLocaleID, routeLocaleFromID, slugFromID } from "$utils/content-id";
+import { hasMathContent } from "$utils/math";
 
 export async function getStaticPaths() {
 	// Get all notes excluding drafts
@@ -31,11 +32,12 @@ const commentItem = Astro.params.id ?? slugFromID(note.id, config.i18n.locales);
 
 // Render markdown content and extract headings for TOC
 const { Content, headings, remarkPluginFrontmatter: frontmatter } = await render(note);
+const math = hasMathContent(note.body);
 
 const t = i18nit(locale);
 ---
 
-<Base title={note.data.title} {locale} description={note.data.description} article={{ timestamp: note.data.timestamp, section: note.data.series, tags: note.data.tags }}>
+<Base title={note.data.title} {locale} description={note.data.description} article={{ timestamp: note.data.timestamp, section: note.data.series, tags: note.data.tags }} {math}>
 	<main class="flex flex-col gap-6">
 		<header class="flex flex-col gap-4">
 			<h1 class="select-text">{note.data.title}</h1>

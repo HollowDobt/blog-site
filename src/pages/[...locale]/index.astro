@@ -5,9 +5,10 @@ import config, { monolocale } from "$config";
 import Time from "$utils/time";
 import Base from "$layouts/Base.astro";
 import Heatmap from "$components/Heatmap.astro";
-import Logo from "$icons/site-logo.svg";
+import logoUrl from "$icons/site-logo.svg?url";
 import i18nit from "$i18n";
 import { matchesLocaleID, slugFromID } from "$utils/content-id";
+import { hasMathContent } from "$utils/math";
 
 export async function getStaticPaths() {
 	// Create path for each locale, omitting default locale from URL
@@ -67,13 +68,14 @@ const latest = items.sort((a, b) => b.data.timestamp.getTime() - a.data.timestam
 const preface = prefaces[0];
 // Render preface content if available, otherwise use empty object
 const { Content } = preface ? await render(preface) : ({} as any);
+const math = hasMathContent(preface?.body);
 ---
 
-<Base title={t("navigation.home")} {locale}>
+<Base title={t("navigation.home")} {locale} {math}>
 	<main class="flex flex-col gap-5 sm:gap-20 grow">
 		<header class="flex items-center justify-center flex-wrap-reverse grow-[0.6]">
 			{config.prologue && <article class="me-auto font-cursive font-thin text-xl sm:text-2xl leading-loose whitespace-pre-line">{config.prologue}</article>}
-			<Logo width={84} class="shrink-0" />
+			<img src={logoUrl} width="84" height="84" alt="" loading="eager" decoding="async" class="shrink-0" />
 		</header>
 
 		{

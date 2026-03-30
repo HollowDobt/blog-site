@@ -8,40 +8,71 @@ import "$styles/global.css";
 import "$styles/markdown.css";
 import "medium-zoom/dist/style.css";
 
-const { locale = config.i18n.defaultLocale, title: subtitle, description = config.description, article } = Astro.props;
+const { locale = config.i18n.defaultLocale, title: subtitle, description = config.description, article, math = false } = Astro.props;
 const title = config.title;
 ---
 
 <script>
-	import MediumnZoom, { type Zoom } from "medium-zoom/dist/pure";
-	import Time from "$utils/time";
-	import { installRenderDebug } from "$utils/render-debug";
+	import Time from "$utils/time-client";
 
 	// Set the `title` attribute of all `<time>` elements to localized date-time strings
 	const localizeTimes = () => document.querySelectorAll("time").forEach(time => time.dateTime && (time.title = Time.toLocaleString(time.dateTime, navigator.language, true)));
 
-	// Add zoom effect to images within markdown content
-	const zoom: Zoom = MediumnZoom(undefined, { background: "#00000044" });
-	window.zoom = () => {
-		zoom.detach();
-		zoom.attach(".markdown img:not([data-nozoom])");
+	type ZoomInstance = {
+		detach: () => unknown;
+		attach: (...selectors: unknown[]) => unknown;
+	};
+
+	let zoom: ZoomInstance | undefined;
+	let zoomReady: Promise<ZoomInstance> | undefined;
+
+	async function ensureZoom() {
+		if (!document.querySelector(".markdown img:not([data-nozoom])")) return;
+
+		if (!zoomReady) {
+			zoomReady = import("medium-zoom/dist/pure").then(({ default: mediumZoom }) => {
+				zoom = mediumZoom(undefined, { background: "#00000044" }) as ZoomInstance;
+				return zoom;
+			});
+		}
+
+		const instance = await zoomReady;
+		if (!instance) return;
+		instance.detach();
+		instance.attach(".markdown img:not([data-nozoom])");
+	}
+
+	window.zoom = () => void ensureZoom();
+
+	const shouldInstallRenderDebug = () => {
+		const query = new URLSearchParams(location.search).get("__render_debug");
+		if (query === "1") return true;
+		if (query === "0") return false;
+		try {
+			return localStorage.getItem("__render_debug_enabled_v1") === "1";
+		} catch {
+			return false;
+		}
 	};
 
 	// Page initialization function
-	function initialize() {
+	async function initialize() {
 		localizeTimes();
-		window.zoom();
+		await ensureZoom();
 	}
 
 	// Execute initialization on first load
-	initialize();
-	installRenderDebug();
+	void initialize();
+
+	if (shouldInstallRenderDebug()) {
+		void import("$utils/render-debug").then(({ installRenderDebug }) => installRenderDebug());
+	}
 
 	// Listen for page load event and re-initialize on page transitions
-	document.addEventListener("astro:page-load", initialize);
+	document.addEventListener("astro:page-load", () => void initialize());
 </script>
 
-<App {locale} {title} {subtitle} {description} {article} author={config.author.name}>
+<App {locale} {title} {subtitle} {description} {article} {math} author={config.author.name}>
 	<Tip client:load />
 	<div class="flex flex-col mx-auto *:*:px-3 w-[min(100%,1000px)]">
 		<!-- Stretch body to full viewport height to prevent layout jumps from toggleable scrollbars. -->

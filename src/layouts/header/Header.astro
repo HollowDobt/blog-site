@@ -56,7 +56,7 @@ const route = Astro.url.pathname;
 	<nav id="sidebar" class="fixed top-0 inset-e-0 flex flex-col justify-between items-start gap-5 p-5 bg-background h-full sm:contents overflow-hidden transition-transform">
 		<header class="grid gap-5 text-secondary grid-rows-[repeat(5,1fr)] sm:grid-rows-none sm:grid-cols-[repeat(4,1fr)]">
 			<button id="sidebar-close" class="sm:hidden"><Icon name="lucide--x" /></button>
-			<Navigator {route} {routes} client:load />
+			<Navigator {route} {routes} client:idle />
 		</header>
 
 		<footer class="flex flex-col items-start gap-2 sm:flex-row sm:gap-7">
@@ -68,7 +68,7 @@ const route = Astro.url.pathname;
 				!monolocale && (
 					<Menu label="Language switcher">
 						<Icon name="lucide--earth" slot="trigger" />
-						<LanguagePicker {locale} {route} client:load />
+						<LanguagePicker {locale} {route} client:idle />
 					</Menu>
 				)
 			}

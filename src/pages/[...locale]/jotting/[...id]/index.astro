@@ -10,6 +10,7 @@ import Sensitive from "$components/Sensitive.svelte";
 import i18nit from "$i18n";
 import { getRelativeLocaleUrl } from "astro:i18n";
 import { matchesLocaleID, routeLocaleFromID, slugFromID } from "$utils/content-id";
+import { hasMathContent } from "$utils/math";
 
 export async function getStaticPaths() {
 	// Get all jottings excluding drafts
@@ -28,11 +29,12 @@ const { locale = config.i18n.defaultLocale } = Astro.params;
 const { jotting } = Astro.props;
 const commentItem = Astro.params.id ?? slugFromID(jotting.id, config.i18n.locales);
 const { Content, remarkPluginFrontmatter: frontmatter } = await render(jotting);
+const math = hasMathContent(jotting.body);
 
 const t = i18nit(locale);
 ---
 
-<Base title={jotting.data.title} {locale} description={jotting.data.description} article={{ timestamp: jotting.data.timestamp, tags: jotting.data.tags }}>
+<Base title={jotting.data.title} {locale} description={jotting.data.description} article={{ timestamp: jotting.data.timestamp, tags: jotting.data.tags }} {math}>
 	<main class="flex flex-col gap-6">
 		<header class="flex flex-col gap-4">
 			<h1 class="select-text">{jotting.data.title}</h1>

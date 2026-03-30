@@ -58,49 +58,38 @@ async function refresh(auto: boolean = true) {
 }
 
 onMount(async () => {
-	let loadDrifter = false;
-	let loadComments = false;
+	const [{ data: drifterProfile, error: drifterError }, { data: commentList, error: commentError }] = await Promise.all([actions.drifter.profile(), actions.comment.list({ section, item })]);
 
-	// Initial load of user authentication status
-	const { data: drifterProfile, error: drifterError } = await actions.drifter.profile();
 	if (!drifterError) {
 		context.drifter = drifterProfile;
-
-		loadDrifter = true;
 	} else {
 		pushTip("error", t("drifter.fetch.failure"));
 	}
 
-	// Initial load of comments
-	const { data: commentList, error: commentError } = await actions.comment.list({ section, item });
 	if (!commentError) {
 		count = commentList.count;
 		comments = commentList.treeification;
-
-		loadComments = true;
 	} else {
 		pushTip("error", t("comment.fetch.failure"));
 	}
 
-	// Initial load of push subscription status
+	loaded = !drifterError && !commentError;
+
 	if (context.push && "serviceWorker" in navigator) {
-		// Register service worker for push notifications
-		const registration = await navigator.serviceWorker.register("/sw.js");
-		const subscription = await registration.pushManager.getSubscription();
+		void (async () => {
+			const registration = await navigator.serviceWorker.register("/sw.js");
+			const subscription = await registration.pushManager.getSubscription();
 
-		if (subscription) {
-			// Verify subscription is still valid on server
-			const { data, error } = await actions.push.check(subscription.endpoint);
-			if (!error && data) {
-				context.subscription = data;
-			} else {
-				// Clean up invalid subscription
-				await subscription.unsubscribe();
+			if (subscription) {
+				const { data, error } = await actions.push.check(subscription.endpoint);
+				if (!error && data) {
+					context.subscription = data;
+				} else {
+					await subscription.unsubscribe();
+				}
 			}
-		}
+		})();
 	}
-
-	loaded = loadComments && loadDrifter;
 });
 </script>
 

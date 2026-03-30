@@ -1,8 +1,8 @@
 <script lang="ts">
 import { actions } from "./actions.client";
 import config from "$config";
-import remark from "$utils/remark";
-import Time from "$utils/time";
+import { renderMarkdown } from "$utils/markdown.client";
+import Time from "$utils/time-client";
 import Icon from "$components/Icon.svelte";
 import Modal from "$components/Modal.svelte";
 import { pushTip } from "$components/Tip.svelte";
@@ -84,7 +84,7 @@ async function remove() {
 				{#if !response.error}
 					{#each response.data.reverse() as item}
 						<dt class="font-bold">{Time(item.timestamp)}</dt>
-						{#await remark.process(item.content) then html}
+						{#await renderMarkdown(item.content) then html}
 							<dd class="markdown comment">{@html html}</dd>
 						{/await}
 					{/each}
@@ -129,7 +129,7 @@ async function remove() {
 		</div>
 		<blockquote class="ms-11">
 			{#if comment.content}
-				<div class="markdown comment">{#await remark.process(comment.content) then html}{@html html}{/await}</div>
+				<div class="markdown comment">{#await renderMarkdown(comment.content) then html}{@html html}{/await}</div>
 				<dd class="flex items-center gap-4 mt-2">
 					<button onclick={() => ((replyView = !replyView), (editView = false))} disabled={!context.turnstile && !context.drifter}><Icon name="lucide--reply" title={t("comment.reply")} /></button>
 					{#if comment.updated && config.comment?.history}<button onclick={() => (historyView = true)}><Icon name="lucide--history" title={t("comment.history")} /></button>{/if}

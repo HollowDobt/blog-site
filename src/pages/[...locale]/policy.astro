@@ -4,6 +4,7 @@ import config, { monolocale } from "$config";
 import Base from "$layouts/Base.astro";
 import i18nit from "$i18n";
 import { getEntry } from "astro:content";
+import { hasMathContent } from "$utils/math";
 
 export async function getStaticPaths() {
 	// Create path for each locale, omitting default locale from URL
@@ -17,9 +18,10 @@ const t = i18nit(locale);
 const localePrefix = monolocale ? `${config.i18n.defaultLocale}/` : `${locale}/`;
 const policy = await getEntry("information", `${localePrefix}policy`);
 const { Content } = policy ? await render(policy) : ({} as any);
+const math = hasMathContent(policy?.body);
 ---
 
-<Base title={t("navigation.policy")} {locale}>
+<Base title={t("navigation.policy")} {locale} {math}>
 	<main>
 		{
 			policy && (
