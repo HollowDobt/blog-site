@@ -7,6 +7,7 @@
   to = "https://blog-api.hollowdobt.com/@/:splat"
   status = 200
   force = true
+  signed = "NETLIFY_PROXY_SIGNING_SECRET"
 
 [[headers]]
   for = "/*"
