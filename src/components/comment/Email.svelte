@@ -10,6 +10,14 @@ const t = i18nit(context.locale);
 
 const drifter = $derived(context.drifter!);
 
+type HumanChallenge = {
+	algorithm: string;
+	challenge: string;
+	salt: string;
+	signature: string;
+	maxnumber?: number;
+};
+
 let address: string | null = $state(drifter.email);
 let edit: boolean = $state(false);
 let limit = $derived(context.limitEmail);
@@ -24,6 +32,39 @@ function resetVerificationState() {
 	confirming = false;
 }
 
+async function solveHumanPayload(challenge: HumanChallenge): Promise<Record<string, unknown> | null> {
+	const max = Number(challenge.maxnumber ?? 100000);
+	const { solveChallenge } = await import("altcha-lib");
+	const task = solveChallenge(challenge.challenge, challenge.salt, challenge.algorithm, max);
+	const solved = await task.promise;
+	if (!solved) return null;
+
+	return {
+		algorithm: challenge.algorithm,
+		challenge: challenge.challenge,
+		salt: challenge.salt,
+		signature: challenge.signature,
+		number: solved.number
+	};
+}
+
+async function solveEmailHumanPayload(): Promise<Record<string, unknown> | null> {
+	const { data, error } = await actions.auth.humanChallenge();
+	if (error) {
+		pushTip("warning", error.message || t("email.verify.send.failure"));
+		return null;
+	}
+
+	try {
+		const payload = await solveHumanPayload(data.challenge);
+		if (!payload) pushTip("warning", t("email.verify.send.failure"));
+		return payload;
+	} catch {
+		pushTip("warning", t("email.verify.send.failure"));
+		return null;
+	}
+}
+
 /**
  * Send verification code to email address
  */
@@ -32,7 +73,10 @@ async function verify() {
 	if (limit > 0) return pushTip("warning", t("email.verify.limit"));
 	if (!address?.trim()) return pushTip("error", t("email.empty"));
 
-	const { data, error } = await actions.email.verify({ locale: context.locale, address });
+	const captchaPayload = await solveEmailHumanPayload();
+	if (!captchaPayload) return;
+
+	const { data, error } = await actions.email.verify({ locale: context.locale, address, captchaPayload });
 	if (!error) {
 		countdownEmail();
 		verificationId = data?.verificationId || "";
@@ -50,11 +94,20 @@ async function verify() {
 
 			case "TOO_MANY_REQUESTS":
 			case "too_many_requests":
-				pushTip("warning", t("email.verify.limit"));
+				pushTip("warning", error.message || t("email.verify.limit"));
 				break;
 
 			case "mail_not_configured":
-				pushTip("error", t("oauth.email.common.mail_unavailable"));
+			case "mail_monthly_limit_reached":
+				pushTip("error", error.message || t("oauth.email.common.mail_unavailable"));
+				break;
+
+			case "ip_permanently_banned":
+				pushTip("error", error.message || t("email.verify.send.failure"));
+				break;
+
+			case "human_verification_failed":
+				pushTip("warning", error.message || t("email.verify.send.failure"));
 				break;
 
 			default:

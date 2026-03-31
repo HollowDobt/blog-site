@@ -153,6 +153,10 @@ async function solveHumanPayload(challenge: HumanChallenge): Promise<Record<stri
 	};
 }
 
+function pushHumanFailure(error?: ActionErrorLike) {
+	pushTip("warning", error?.message || t("oauth.email.human.failure"));
+}
+
 async function loadHumanChallenge() {
 	const { data, error } = await actions.auth.humanChallenge();
 	if (!error) {
@@ -161,6 +165,7 @@ async function loadHumanChallenge() {
 	} else {
 		registerHumanChallenge = null;
 		registerHumanPayload = null;
+		if (error.message) pushTip("warning", error.message);
 	}
 }
 
@@ -174,7 +179,7 @@ async function verifyRegisterHuman() {
 	if (registerHumanVerifying || emailAuthPending) return;
 	if (!registerHumanChallenge) await loadHumanChallenge();
 	if (!registerHumanChallenge) {
-		pushTip("warning", t("oauth.email.human.failure"));
+		pushHumanFailure();
 		return;
 	}
 
@@ -183,14 +188,14 @@ async function verifyRegisterHuman() {
 		const payload = await solveHumanPayload(registerHumanChallenge);
 		if (!payload) {
 			registerHumanPayload = null;
-			pushTip("warning", t("oauth.email.human.failure"));
+			pushHumanFailure();
 			return;
 		}
 		registerHumanPayload = payload;
 		pushTip("success", t("oauth.email.human.done"));
 	} catch {
 		registerHumanPayload = null;
-		pushTip("warning", t("oauth.email.human.failure"));
+		pushHumanFailure();
 	} finally {
 		registerHumanVerifying = false;
 	}
@@ -198,10 +203,14 @@ async function verifyRegisterHuman() {
 
 async function solveCommentHumanPayload(): Promise<Record<string, unknown> | null> {
 	const { data, error } = await actions.auth.humanChallenge();
-	if (error) return null;
+	if (error) {
+		pushHumanFailure(error);
+		return null;
+	}
 	try {
 		return await solveHumanPayload(data.challenge);
 	} catch {
+		pushHumanFailure();
 		return null;
 	}
 }
@@ -380,7 +389,7 @@ async function submitEmailAuth() {
 
 				case "TOO_MANY_REQUESTS":
 				case "too_many_requests":
-					pushTip("error", t("comment.limit"));
+					pushTip("error", result.error.message || t("comment.limit"));
 					break;
 
 				case "ip_account_limit":
@@ -388,7 +397,12 @@ async function submitEmailAuth() {
 					break;
 
 				case "mail_not_configured":
-					pushTip("error", t("oauth.email.common.mail_unavailable"));
+				case "mail_monthly_limit_reached":
+					pushTip("error", result.error.message || t("oauth.email.common.mail_unavailable"));
+					break;
+
+				case "ip_permanently_banned":
+					pushTip("error", result.error.message || t("oauth.email.common.failure"));
 					break;
 
 				case "invalid_email":
@@ -397,7 +411,7 @@ async function submitEmailAuth() {
 					break;
 
 				case "human_verification_failed":
-					pushTip("warning", t("oauth.email.human.failure"));
+					pushHumanFailure(result.error);
 					registerHumanPayload = null;
 					await loadHumanChallenge();
 					break;
@@ -461,7 +475,13 @@ async function submitEmailAuth() {
 		return;
 	}
 
-	const result = await actions.auth.emailLogin({ email, password });
+	const loginHumanPayload = await solveCommentHumanPayload();
+	if (!loginHumanPayload) {
+		emailAuthPending = false;
+		return;
+	}
+
+	const result = await actions.auth.emailLogin({ email, password, captchaPayload: loginHumanPayload });
 	emailAuthPending = false;
 
 	if (!result.error) {
@@ -475,6 +495,19 @@ async function submitEmailAuth() {
 		case "UNAUTHORIZED":
 		case "invalid_credentials":
 			pushTip("error", t("oauth.email.login.failure"));
+			break;
+
+		case "TOO_MANY_REQUESTS":
+		case "too_many_requests":
+			pushTip("error", result.error.message || t("comment.limit"));
+			break;
+
+		case "human_verification_failed":
+			pushHumanFailure(result.error);
+			break;
+
+		case "ip_permanently_banned":
+			pushTip("error", result.error.message || t("oauth.email.common.failure"));
 			break;
 
 		case "invalid_email":

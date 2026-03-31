@@ -412,10 +412,22 @@ export const actions = {
 				body: JSON.stringify(payload)
 			});
 		},
-		emailLogin: async ({ email, password }: { email: string; password: string }): ActionResult<void> => {
+		emailLogin: async ({
+			email,
+			password,
+			captchaPayload,
+			challengeToken,
+			challengeAnswer
+		}: {
+			email: string;
+			password: string;
+			captchaPayload?: unknown;
+			challengeToken?: string;
+			challengeAnswer?: string;
+		}): ActionResult<void> => {
 			return request<void>("/@/reach/email/login", {
 				method: "POST",
-				body: JSON.stringify({ email, password })
+				body: JSON.stringify({ email, password, captchaPayload, challengeToken, challengeAnswer })
 			});
 		}
 	},
@@ -440,7 +452,19 @@ export const actions = {
 	},
 
 	email: {
-		verify: async ({ locale, address }: { locale: string; address?: string | null }): ActionResult<{
+		verify: async ({
+			locale,
+			address,
+			captchaPayload,
+			challengeToken,
+			challengeAnswer
+		}: {
+			locale: string;
+			address?: string | null;
+			captchaPayload?: unknown;
+			challengeToken?: string;
+			challengeAnswer?: string;
+		}): ActionResult<{
 			phase?: string;
 			verificationId?: string;
 			email?: string;
@@ -455,7 +479,7 @@ export const actions = {
 				expiresIn?: number;
 			}>("/@/email/verify", {
 				method: "POST",
-				body: JSON.stringify({ locale, address })
+				body: JSON.stringify({ locale, address, captchaPayload, challengeToken, challengeAnswer })
 			});
 		},
 		confirm: async ({ verificationId, code }: { verificationId: string; code: string }): ActionResult<{
